@@ -1,3 +1,0 @@
-/home/srijan/Desktop/Fellowship_CPP/ChatApp/ChatApplication/build/CMakeFiles/rebuild_cache.dir
-/home/srijan/Desktop/Fellowship_CPP/ChatApp/ChatApplication/build/CMakeFiles/edit_cache.dir
-/home/srijan/Desktop/Fellowship_CPP/ChatApp/ChatApplication/build/CMakeFiles/ChatApp.dir
