@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/ChatApp.dir/server/view/server_view.cpp.o CMakeFiles/ChatApp.dir/server/controller/server_controller.cpp.o CMakeFiles/ChatApp.dir/server/controller/main.cpp.o -o ChatApp 
