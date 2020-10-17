@@ -1,13 +1,15 @@
 #pragma once
 #include <iostream>
 #include <string>
-
-class ClientView{
-    private:
+using namespace std;
+class ClientView
+{
+private:
     int input;
     std::string username;
     std::string message;
-    public:
+
+public:
     int selectOption();
     void viewMessage(std::string);
     std::string getMessage();

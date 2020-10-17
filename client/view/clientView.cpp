@@ -2,6 +2,10 @@
 
 int ClientView::selectOption()
 {
+    int choice;
+    cout << " 1: To chat with online clients\n"
+         << " 2: To enter chat room " << endl;
+    cin >> choice;
     return 0;
 }
 
