@@ -10,34 +10,49 @@
 #include <vector>
 #include <thread>
 #include <mutex>
-#define PORT 45000
-inline char message[100];
+#define PORT 54200
+#define CHATROOM "CHATROOM"
+#define EXIT "bye exit"
+static char message[100];
+static int client_socket;
 enum SERVICE_CONSTANTS
 {
     SOCKET_CREATED = 0,
     MIN_LENTGTH = 0
 };
 
+
 void *recv_message(void *my_sock);
 
 class ClientService
 {
 private:
-    char send_msg[500];
+    //char msg[500];
     pthread_t receiving_thread;
     int length;
-    int client_socket;
+    //int client_socket;
     int socket_value;
+    
 
     struct sockaddr_in ServerIp;
     std::string client_name;
+    std::string delimiter = ">=";
 
 public:
     int createConnection();
     bool getConnectionStatus();
-    void getClientMessage(std::string);
+    void chatroomMessage();
     void closeConnection();
     void setClientName(std::string);
-    void createThread();
+    void sendToServer(int, std::string);
+    std::string receiveFromServer(int);
     friend class ClientController;
+    std::string getMessage();
+    void exitMethod();
+    static void setMessage(std::string);
+    static void *message_helper(void *context)
+    {
+        return ((ClientService *)context)->recv_message(&client_socket);
+    }
+    void *recv_message(void *);
 };
