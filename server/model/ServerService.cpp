@@ -22,3 +22,18 @@ bool ServerService::getConnectionStatus()
         return true;
     return false;
 }
+
+void ServerService::acceptIncomingClients()
+{
+    while (1)
+    {
+        if ((client_sock = accept(sock, (struct sockaddr *)NULL, NULL)) < 0)
+            printf("[-]Accept failed  \n");
+        pthread_mutex_lock(&mutex);
+        clients[client_array_size] = client_sock;
+        client_array_size++;
+        // creating a thread for each client
+        pthread_create(&recvt, NULL, &threadReferenceHelper, &client_sock);
+        pthread_mutex_unlock(&mutex);
+    }
+}
