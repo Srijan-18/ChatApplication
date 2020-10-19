@@ -10,19 +10,31 @@ class ClientController
 public:
     void startChat()
     {
-        if (client_service.getConnectionStatus() == true)
+        bool end_key = true;
+        client_service.setClientName(client_view.getusername());
+        while (end_key)
         {
-            std::cout << "Connection succesful" << std::endl;
-            client_service.setClientName(client_view.getusername());
-            client_service.createThread();
-            while (true)
+            if (client_service.getConnectionStatus() != true)
             {
-                client_view.setMessage();
-                client_message_view = client_view.getMessage();
-                client_service.getClientMessage(client_message_view);
+                break;
+            }
+            int user_choice = client_view.selectOption();
+            switch (user_choice)
+            {
+                case 1:
+                    {
+                    client_service.chatroomMessage();
+                    client_service.closeConnection();
+                    }
+                break;
+                case 3:
+                    end_key = false;
+                    break;
+                default:
+                    std::cout << "Invalid Input " << std::endl;
+                    break;
             }
         }
-        client_service.closeConnection();
     }
 };
 
