@@ -53,8 +53,23 @@ void ServerService::acceptIncomingClients()
         pthread_mutex_unlock(&mutex);
     }
 }
-void ServerService::exitClientMethod(int sock, vector<string> message)
+void ServerService::exitClientMethod(int sock, vector<string> messageVector)
 {
+     
+    string message = messageVector[1] + messageVector[2];
+    //sendtoall(message, sock);
+    for (int i = 0; i < client_array_size; i++)
+    {
+        if (clients[i] == sock)
+        {
+            clients[i] = -1;
+        }
+    }
+    for (auto elem : online_clients)
+    {
+        if (elem.second == sock)
+            online_clients.erase(elem.first);
+    }
 }
 
 string ServerService::receiveFromClient(int sock)
