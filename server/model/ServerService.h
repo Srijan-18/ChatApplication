@@ -19,6 +19,7 @@
 using namespace std;
 
 static int client_socket;
+std::map<std::string, int> online_clients;
 
 enum SERVICE_CONSTANTS
 {

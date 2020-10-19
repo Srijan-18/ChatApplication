@@ -59,6 +59,15 @@ void ServerService::exitClientMethod(int sock, vector<string> message)
 
 string ServerService::receiveFromClient(int sock)
 {
+    char msg[500];
+    bzero(msg, sizeof(msg));
+    recv(sock, msg, 500, 0);
+    return std::string(msg);
+}
+
+void ServerService::addOnlineClient(std::string client_name, int sock)
+{
+    online_clients[client_name] = sock;
 }
 
 void *ServerService::receiveInputFromClient(void *client_sock)
@@ -75,7 +84,7 @@ void *ServerService::receiveInputFromClient(void *client_sock)
 
         if (client_response[0] == REGISTER)
         {
-            //addOnlineClient(client_response[1], sock);
+            addOnlineClient(client_response[1], sock);
             client_response.clear();
         }
 
@@ -86,7 +95,7 @@ void *ServerService::receiveInputFromClient(void *client_sock)
 
         if (client_response[0] == CHATROOM)
         {
-            //createMessageFormat(client_response, sock);
+            createMessageFormat(client_response, sock);
         }
         received_from_client.clear();
     }
