@@ -15,3 +15,10 @@ int ServerService::createConnection()
         printf("[-]Listening failed \n");
 }
 
+bool ServerService::getConnectionStatus()
+{
+    int connection_status_value = createConnection();
+    if (connection_status_value >= SOCKET_CREATED)
+        return true;
+    return false;
+}
