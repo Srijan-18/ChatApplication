@@ -7,6 +7,7 @@ void welcomeGreeting(ServerController);
 int main()
 {
     ServerController server_controller;
+    server_controller.startServer();
     welcomeGreeting(server_controller);
 }
 
