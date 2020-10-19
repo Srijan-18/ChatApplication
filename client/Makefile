@@ -8,4 +8,4 @@ clean:
 all :  $(Client)
 
 $(Client):
-		$(compiler) -w ./client/controller/ClientController.cpp ./client/model/ClientService.cpp ./client/model/ClientService.h ./client/view/clientView.cpp ./client/view/clientView.h -o $(Client) -pthread
+		$(compiler) -w ./controller/ClientController.cpp ./model/ClientService.cpp ./model/ClientService.h ./view/clientView.cpp ./view/clientView.h -o $(Client) -pthread
