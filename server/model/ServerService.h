@@ -24,7 +24,8 @@ std::map<std::string, int> online_clients;
 enum SERVICE_CONSTANTS
 {
     SOCKET_CREATED = 0,
-    MIN_LENTGTH = 0
+    MIN_LENTGTH = 0,
+    MIN_SOCKET_VALUE = 0
 };
 
 class ServerService

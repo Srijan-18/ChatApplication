@@ -53,9 +53,28 @@ void ServerService::acceptIncomingClients()
         pthread_mutex_unlock(&mutex);
     }
 }
+
+void ServerService::sendToAllClients(string message, int current_sock)
+{
+     int client;
+    pthread_mutex_lock(&mutex);
+    for (client = 0; client < client_array_size; client++)
+    {
+        if (clients[client] > MIN_SOCKET_VALUE)
+        {
+            if (clients[client] != current_sock)
+            {
+                sendToClient(clients[client], message);
+                continue;
+            }
+        }
+    }
+    pthread_mutex_unlock(&mutex);
+}
+
 void ServerService::exitClientMethod(int sock, vector<string> messageVector)
 {
-     
+
     string message = messageVector[1] + messageVector[2];
     //sendtoall(message, sock);
     for (int i = 0; i < client_array_size; i++)
@@ -83,6 +102,23 @@ string ServerService::receiveFromClient(int sock)
 void ServerService::addOnlineClient(std::string client_name, int sock)
 {
     online_clients[client_name] = sock;
+}
+
+void ServerService::createMessageFormat(vector<string> &client_message, int sock)
+{
+
+    string message;
+    string client_name;
+    if (client_message[0] == CHATROOM)
+    {
+        for (int i = 1; i < client_message.size(); i++)
+        {
+            message += client_message[i] + " ";
+        }
+        client_name = client_message[1];
+        sendToAllClients(message, sock);
+    }
+    message.clear();
 }
 
 void *ServerService::receiveInputFromClient(void *client_sock)
