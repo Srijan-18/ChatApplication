@@ -10,7 +10,7 @@
 #include <vector>
 #include <thread>
 #include <mutex>
-#define PORT 54200
+#define PORT 35789
 #define CHATROOM "CHATROOM"
 #define EXIT "bye exit"
 static char message[100];
