@@ -54,9 +54,14 @@ void ServerService::acceptIncomingClients()
     }
 }
 
+void ServerService::sendToClient(int sock, string send_msg)
+{
+      send(sock, send_msg.c_str(), strlen(send_msg.c_str()), 0);
+}
+
 void ServerService::sendToAllClients(string message, int current_sock)
 {
-     int client;
+    int client;
     pthread_mutex_lock(&mutex);
     for (client = 0; client < client_array_size; client++)
     {
@@ -119,6 +124,22 @@ void ServerService::createMessageFormat(vector<string> &client_message, int sock
         sendToAllClients(message, sock);
     }
     message.clear();
+}
+
+std::vector<std::string> splitter(const std::string &client_response, std::string delimiter)
+{
+    size_t pos_start = 0, pos_end, delim_len = delimiter.length();
+    std::string token;
+    std::vector<std::string> res;
+
+    while ((pos_end = client_response.find(delimiter, pos_start)) != std::string::npos)
+    {
+        token = client_response.substr(pos_start, pos_end - pos_start);
+        pos_start = pos_end + delim_len;
+        res.push_back(token);
+    }
+    res.push_back(client_response.substr(pos_start));
+    return res;
 }
 
 void *ServerService::receiveInputFromClient(void *client_sock)
