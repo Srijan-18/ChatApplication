@@ -3,10 +3,11 @@
 int ClientView::selectOption()
 {
     int choice;
-    cout << " 1: To chat with online clients\n"
-         << " 2: To enter chat room " << endl;
+    cout << " 1: To enter chat room\n"
+         << " 3: Exit "
+         << endl;
     cin >> choice;
-    return 0;
+    return choice;
 }
 
 void ClientView::viewMessage(std::string received_message)
@@ -34,4 +35,9 @@ std::string ClientView::getusername()
 {
     setUsername();
     return username;
+}
+
+void ClientView::displayMessage(std::string message)
+{
+    cout << message << endl;
 }

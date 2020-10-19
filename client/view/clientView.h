@@ -16,4 +16,5 @@ public:
     void setMessage();
     void setUsername();
     std::string getusername();
+    void displayMessage(string);
 };
