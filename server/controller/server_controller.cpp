@@ -9,7 +9,6 @@ void ServerController::printWelcomeMessage()
 
 void ServerController::startServer()
 {
-    server_service.createConnection();
     if(server_service.getConnectionStatus() == true)
     {
         cout << "Connection succesfull" << endl;
