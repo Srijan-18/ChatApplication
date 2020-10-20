@@ -10,7 +10,10 @@
 #include <vector>
 #include <thread>
 #include <mutex>
-#define PORT 35789
+
+using namespace std;
+
+#define PORT 50001
 #define CHATROOM "CHATROOM"
 #define EXIT "bye exit"
 static char message[100];
@@ -43,6 +46,9 @@ public:
     bool getConnectionStatus();
     void chatroomMessage();
     void closeConnection();
+    void registerClient(int, std::string);
+    int getSocketValue();
+    std::string getUserName();
     void setClientName(std::string);
     void sendToServer(int, std::string);
     std::string receiveFromServer(int);

@@ -3,11 +3,18 @@
 int ClientService::createConnection()
 {
     client_socket = socket(AF_INET, SOCK_STREAM, 0);
-    ServerIp.sin_port = htons(PORT);
+    ServerIp.sin_port = htons(47896);
     ServerIp.sin_family = AF_INET;
     ServerIp.sin_addr.s_addr = INADDR_ANY;
     socket_value = connect(client_socket, (struct sockaddr *)&ServerIp, sizeof(ServerIp));
-    return socket_value;
+    return client_socket;
+}
+
+void ClientService::registerClient(int sock, std::string username)
+{
+    std::string send_to_client;
+    send_to_client = "REGISTER>=" + username + ">=";
+    sendToServer(sock, send_to_client);
 }
 
 bool ClientService::getConnectionStatus()
@@ -16,6 +23,16 @@ bool ClientService::getConnectionStatus()
     if (connection_status_value >= SOCKET_CREATED)
         return true;
     return false;
+}
+
+int ClientService::getSocketValue()
+{
+    return client_socket;
+}
+
+std::string ClientService::getUserName()
+{
+    return client_name;
 }
 
 void ClientService::chatroomMessage()
@@ -60,7 +77,7 @@ void ClientService::closeConnection()
 
 void ClientService::sendToServer(int sock, std::string send_msg)
 {
-    write(sock, send_msg.c_str(), strlen(send_msg.c_str()));
+    send(sock, send_msg.c_str(), strlen(send_msg.c_str()),0);
     memset(message, 0, sizeof(message));
 }
 
