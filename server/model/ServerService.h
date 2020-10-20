@@ -11,7 +11,6 @@
 #include <vector>
 #include <istream>
 
-#define CLIENTS "CLIENTS"
 #define REGISTER "REGISTER"
 #define CHATROOM "CHATROOM"
 #define EXIT "bye exit"
@@ -19,6 +18,8 @@
 using namespace std;
 
 static int client_socket;
+static vector<int> clients;
+
 static std::map<std::string, int> online_clients;
 
 enum SERVICE_CONSTANTS
@@ -28,14 +29,15 @@ enum SERVICE_CONSTANTS
     MIN_SOCKET_VALUE = 0
 };
 
+// static void *receiveInputFromClient(void *);
+
 class ServerService
 {
     pthread_mutex_t mutex;
-    int clients[20];
+
     struct sockaddr_in ServerIp;
     pthread_t recvt;
-    int sock = 0, client_sock = 0;
-    int client_array_size = 0;
+    int sock = 0;
 
 public:
     int createConnection();

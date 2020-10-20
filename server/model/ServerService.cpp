@@ -4,27 +4,15 @@ int ServerService::createConnection()
 {
     system("clear");
     ServerIp.sin_family = AF_INET;
-    ServerIp.sin_port = htons(35789);
+    ServerIp.sin_port = htons(47896);
     ServerIp.sin_addr.s_addr = htonl(INADDR_ANY);
     sock = socket(AF_INET, SOCK_STREAM, 0);
-    int value;
-    int opt = 1;
-    if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (char *)&opt, sizeof(opt)) < 0)
-    {
-        perror("setsockopt");
-        exit(EXIT_FAILURE);
-    }
-    if (setsockopt(sock, SOL_SOCKET, SO_REUSEPORT, (char *)&opt, sizeof(opt)) < 0)
-    {
-        perror("setsockopt");
-        exit(EXIT_FAILURE);
-    }
-    if ((value = bind(sock, (struct sockaddr *)&ServerIp, sizeof(ServerIp))) == -1)
-        printf("[-]Bind unsuccessful, error!! %d \n", value);
+    if ((bind(sock, (struct sockaddr *)&ServerIp, sizeof(ServerIp))) == -1)
+        perror("[-]Bind unsuccessful, error!!");
     else
-        printf("[+]Server Started\n");
+        cout << "[+]Server Started\n";
     if (listen(sock, 2) == -1)
-        printf("[-]Listening failed \n");
+        perror("[-]Listening failed \n");
     return sock;
 }
 
@@ -38,39 +26,34 @@ bool ServerService::getConnectionStatus()
 
 void ServerService::acceptIncomingClients()
 {
+    ServerService service;
     while (1)
     {
-        ServerService service;
-        cout << "In accept method" << endl;
-        if ((client_sock = accept(sock, (struct sockaddr *)NULL, NULL)) < 0)
+        if ((client_socket = accept(sock, (struct sockaddr *)NULL, NULL)) < 0)
             printf("[-]Accept failed  \n");
-        cout << "This is the client socket : " << client_sock << endl;
         pthread_mutex_lock(&mutex);
-        clients[client_array_size] = client_sock;
-        client_array_size++;
+        clients.push_back(client_socket);
         //creating a thread for each client
-        pthread_create(&recvt, NULL, threadReferenceHelper, &service);
+        pthread_create(&recvt, NULL, &threadReferenceHelper, &service);
         pthread_mutex_unlock(&mutex);
     }
 }
 
 void ServerService::sendToClient(int sock, string send_msg)
 {
-      send(sock, send_msg.c_str(), strlen(send_msg.c_str()), 0);
+    send(sock, send_msg.c_str(), strlen(send_msg.c_str()), 0);
 }
 
 void ServerService::sendToAllClients(string message, int current_sock)
 {
     int client;
     pthread_mutex_lock(&mutex);
-    for (client = 0; client < client_array_size; client++)
+    for (client = 0; client < clients.size(); client++)
     {
-        if (clients[client] > MIN_SOCKET_VALUE)
+        if (clients[client] > MIN_SOCKET_VALUE && clients[client] != current_sock)
         {
-            if (clients[client] != current_sock)
             {
                 sendToClient(clients[client], message);
-                continue;
             }
         }
     }
@@ -81,18 +64,21 @@ void ServerService::exitClientMethod(int sock, vector<string> messageVector)
 {
 
     string message = messageVector[1] + messageVector[2];
-    //sendtoall(message, sock);
-    for (int i = 0; i < client_array_size; i++)
+    sendToAllClients(message, sock);
+    for (int i = 0; i < clients.size(); i++)
     {
         if (clients[i] == sock)
         {
             clients[i] = -1;
         }
     }
-    for (auto elem : online_clients)
+    for (auto element : online_clients)
     {
-        if (elem.second == sock)
-            online_clients.erase(elem.first);
+        if (element.second == sock)
+        {
+            online_clients.erase(element.first);
+            break;
+        }
     }
 }
 
@@ -111,7 +97,6 @@ void ServerService::addOnlineClient(std::string client_name, int sock)
 
 void ServerService::createMessageFormat(vector<string> &client_message, int sock)
 {
-
     string message;
     string client_name;
     if (client_message[0] == CHATROOM)
@@ -126,7 +111,7 @@ void ServerService::createMessageFormat(vector<string> &client_message, int sock
     message.clear();
 }
 
-std::vector<std::string> splitter(const std::string &client_response, std::string delimiter)
+std::vector<std::string> ServerService::splitter(const std::string &client_response, std::string delimiter)
 {
     size_t pos_start = 0, pos_end, delim_len = delimiter.length();
     std::string token;
@@ -156,6 +141,7 @@ void *ServerService::receiveInputFromClient(void *client_sock)
 
         if (client_response[0] == REGISTER)
         {
+            cout << "Registering " << client_response[1] << " ..." << endl;
             addOnlineClient(client_response[1], sock);
             client_response.clear();
         }
