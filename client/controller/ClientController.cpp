@@ -12,27 +12,30 @@ public:
     {
         bool end_key = true;
         client_service.setClientName(client_view.getusername());
+        if (client_service.getConnectionStatus() != true)
+        {
+            exit(0);
+        }
+        std::string name = client_service.getUserName();
+        int socket = client_service.getSocketValue();
+        client_service.registerClient(socket, name);
         while (end_key)
         {
-            if (client_service.getConnectionStatus() != true)
-            {
-                break;
-            }
             int user_choice = client_view.selectOption();
             switch (user_choice)
             {
-                case 1:
-                    {
-                    client_service.chatroomMessage();
-                    client_service.closeConnection();
-                    }
+            case 1:
+            {
+                client_service.chatroomMessage();
+                client_service.closeConnection();
+            }
+            break;
+            case 3:
+                end_key = false;
                 break;
-                case 3:
-                    end_key = false;
-                    break;
-                default:
-                    std::cout << "Invalid Input " << std::endl;
-                    break;
+            default:
+                std::cout << "Invalid Input " << std::endl;
+                break;
             }
         }
     }
