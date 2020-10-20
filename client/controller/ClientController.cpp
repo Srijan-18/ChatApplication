@@ -11,6 +11,11 @@ public:
     void startChat()
     {
         bool end_key = true;
+        cout << "******************************\n"
+             << "                              \n"
+             << "      Welcome to Chat App     \n"
+             << "                              \n"
+             << "******************************\n" << endl;
         client_service.setClientName(client_view.getusername());
         if (client_service.getConnectionStatus() != true)
         {
