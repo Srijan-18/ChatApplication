@@ -3,9 +3,10 @@
 int ClientView::selectOption()
 {
     int choice;
-    cout << " 1: To enter chat room\n"
-         << " 3: Exit "
-         << endl;
+    cout << "\n***** USER OPTIONS *****\n"
+         <<"\n1 : To enter chat room\n"
+         << "9 : Exit\n"
+         << "\nYOUR CHOICE : ";
     cin >> choice;
     return choice;
 }
@@ -25,19 +26,25 @@ void ClientView::setMessage()
     std::cin >> message;
 }
 
-void ClientView::setUsername()
-{
-    std::cout << "Enter username : ";
-    std::cin >> username;
-}
-
-std::string ClientView::getusername()
-{
-    setUsername();
-    return username;
-}
-
 void ClientView::displayMessage(std::string message)
 {
     cout << message << endl;
+}
+
+void ClientView::printWelcomeMessage()
+{
+    cout << "******************************\n"
+         << "                              \n"
+         << "      Welcome to Chat App     \n"
+         << "                              \n"
+         << "******************************\n"
+         << endl;
+}
+
+string ClientView::getInputFor(string requiredInput)
+{
+    string input;
+    std::cout << "Enter " << requiredInput << " : ";
+    cin >> input;
+    return input;
 }
