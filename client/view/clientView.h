@@ -6,15 +6,14 @@ class ClientView
 {
 private:
     int input;
-    std::string username;
     std::string message;
 
 public:
+    void printWelcomeMessage();
     int selectOption();
     void viewMessage(std::string);
     std::string getMessage();
     void setMessage();
-    void setUsername();
-    std::string getusername();
     void displayMessage(string);
+    string getInputFor(string);
 };
