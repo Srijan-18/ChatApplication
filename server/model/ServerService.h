@@ -13,7 +13,7 @@
 
 #define REGISTER "REGISTER"
 #define CHATROOM "CHATROOM"
-#define EXIT "bye exit"
+#define EXIT "##EXIT"
 
 using namespace std;
 
