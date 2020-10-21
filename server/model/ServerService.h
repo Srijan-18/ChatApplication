@@ -29,8 +29,6 @@ enum SERVICE_CONSTANTS
     MIN_SOCKET_VALUE = 0
 };
 
-// static void *receiveInputFromClient(void *);
-
 class ServerService
 {
     pthread_mutex_t mutex;
