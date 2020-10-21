@@ -7,6 +7,12 @@ class ClientController
     ClientView client_view;
     std::string client_message_view;
 
+    enum Input_Constants
+    {
+        TO_CHATROOM = 1,
+        QUIT = 9
+    };
+
 public:
     void startChat()
     {
@@ -25,17 +31,17 @@ public:
             int user_choice = client_view.selectOption();
             switch (user_choice)
             {
-            case 1:
+            case TO_CHATROOM:
             {
                 client_service.chatroomMessage();
                 client_service.closeConnection();
             }
             break;
-            case 3:
+            case QUIT:
                 end_key = false;
                 break;
             default:
-                std::cout << "Invalid Input " << std::endl;
+                client_view.displayMessage("\n##  Invalid Input  ##");
                 break;
             }
         }
