@@ -15,28 +15,24 @@ using namespace std;
 
 #define PORT 50001
 #define CHATROOM "CHATROOM"
-#define EXIT "bye exit"
+#define EXIT "##EXIT"
+
 static char message[100];
 static int client_socket;
+
 enum SERVICE_CONSTANTS
 {
     SOCKET_CREATED = 0,
     MIN_LENTGTH = 0
 };
 
-
-void *recv_message(void *my_sock);
-
 class ClientService
 {
 private:
-    //char msg[500];
     pthread_t receiving_thread;
     int length;
-    //int client_socket;
     int socket_value;
     
-
     struct sockaddr_in ServerIp;
     std::string client_name;
     std::string delimiter = ">=";
