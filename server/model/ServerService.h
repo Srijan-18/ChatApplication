@@ -13,12 +13,15 @@
 
 #define REGISTER "REGISTER"
 #define CHATROOM "CHATROOM"
+#define LOGIN "LOGIN"
 #define EXIT "##EXIT"
 
 using namespace std;
 
 static int client_socket;
 static vector<int> clients;
+
+
 
 static std::map<std::string, int> online_clients;
 
@@ -31,7 +34,7 @@ enum SERVICE_CONSTANTS
 
 class ServerService
 {
-    pthread_mutex_t mutex;
+    pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
     struct sockaddr_in ServerIp;
     pthread_t recvt;
@@ -46,6 +49,7 @@ public:
     void sendToAllClients(string, int);
     void exitClientMethod(int, vector<string>);
     void addOnlineClient(string, int);
+    void checkUserExists(string,int);
     vector<string> splitter(const string &, string);
     void createMessageFormat(vector<string> &, int);
     void *receiveInputFromClient(void *);

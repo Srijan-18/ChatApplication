@@ -27,6 +27,7 @@ bool ServerService::getConnectionStatus()
 void ServerService::acceptIncomingClients()
 {
     ServerService service;
+    online_clients["Srijan"] = 0;
     while (1)
     {
         if ((client_socket = accept(sock, (struct sockaddr *)NULL, NULL)) < 0)
@@ -93,6 +94,7 @@ string ServerService::receiveFromClient(int sock)
 void ServerService::addOnlineClient(std::string client_name, int sock)
 {
     online_clients[client_name] = sock;
+    sendToClient(sock,"REGISTERED");
 }
 
 void ServerService::createMessageFormat(vector<string> &client_message, int sock)
@@ -109,6 +111,22 @@ void ServerService::createMessageFormat(vector<string> &client_message, int sock
         sendToAllClients(message, sock);
     }
     message.clear();
+}
+
+void ServerService::checkUserExists(string user_name, int sock)
+{
+    string result = "FAILED";
+    cout << "Username : " << user_name << endl;
+    for (auto element : online_clients)
+    {
+        if (element.first == user_name)
+        {
+            element.second = sock;
+            result = "SUCCESS";
+            break;
+        }
+    }
+    sendToClient(sock, result);
 }
 
 std::vector<std::string> ServerService::splitter(const std::string &client_response, std::string delimiter)
@@ -143,6 +161,12 @@ void *ServerService::receiveInputFromClient(void *client_sock)
         {
             cout << "Registering " << client_response[1] << " ..." << endl;
             addOnlineClient(client_response[1], sock);
+            client_response.clear();
+        }
+
+        if (client_response[0] == LOGIN)
+        {
+            checkUserExists(client_response[1], sock);
             client_response.clear();
         }
 
