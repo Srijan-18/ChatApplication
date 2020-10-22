@@ -15,6 +15,7 @@ void ClientService::registerClient(int sock, std::string username)
     std::string send_to_client;
     send_to_client = "REGISTER>=" + username + ">=";
     sendToServer(sock, send_to_client);
+    cout << receiveFromServer(sock) << endl; 
 }
 
 bool ClientService::getConnectionStatus()
@@ -77,7 +78,7 @@ void ClientService::closeConnection()
 
 void ClientService::sendToServer(int sock, std::string send_msg)
 {
-    send(sock, send_msg.c_str(), strlen(send_msg.c_str()),0);
+    send(sock, send_msg.c_str(), strlen(send_msg.c_str()), 0);
     memset(message, 0, sizeof(message));
 }
 
@@ -91,6 +92,19 @@ std::string ClientService::receiveFromServer(int sock)
 void ClientService::setClientName(std::string o_client_name)
 {
     client_name = o_client_name;
+}
+
+bool ClientService::loginClient(int socket, string client_name)
+{
+    std::string send_to_server;
+    send_to_server = "LOGIN>=" + client_name + ">=";
+    sendToServer(socket, send_to_server);
+    string server_response = receiveFromServer(socket);
+    if (server_response.find("SUCCESS")!= std::string::npos)
+    {
+        return true;
+    }
+    return false;
 }
 
 void *ClientService::recv_message(void *my_sock)
