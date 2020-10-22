@@ -43,6 +43,7 @@ public:
     void chatroomMessage();
     void closeConnection();
     void registerClient(int, std::string);
+    bool loginClient(int, string);
     int getSocketValue();
     std::string getUserName();
     void setClientName(std::string);
