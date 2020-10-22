@@ -95,7 +95,8 @@ string ServerService::receiveFromClient(int sock)
 void ServerService::addOnlineClient(std::string client_name, int sock)
 {
     online_clients[client_name] = sock;
-    sendToClient(sock, "REGISTERED");
+    sendToClient(sock, "\nREGISTERATION SUCCESSFUL");
+
 }
 
 void ServerService::createMessageFormat(vector<string> &client_message, int sock)
@@ -119,20 +120,20 @@ void ServerService::saveClientCredentials(string client_name, string client_pass
     client_credentials[client_name] = client_password;
 }
 
-void ServerService::checkClientsCredentials(string user_name, string password, int sock)
+bool ServerService::checkClientsCredentials(string user_name, string password, int sock)
 {
-    string result = "FAILED";
-    cout << "Username : " << user_name << endl;
+    bool client_duplication = false;
+    cout << user_name << " Logged In." << endl;
     for (auto element : client_credentials)
     {
         if (element.first == user_name && element.second == password)
         {
             online_clients[user_name] = sock;
-            result = "SUCCESS";
+            client_duplication = true;
             break;
         }
     }
-    sendToClient(sock, result);
+    return client_duplication;
 }
 
 std::vector<std::string> ServerService::splitter(const std::string &client_response, std::string delimiter)
@@ -166,14 +167,25 @@ void *ServerService::receiveInputFromClient(void *client_sock)
         if (client_response[0] == REGISTER)
         {
             cout << "Registering " << client_response[1] << " ..." << endl;
-            saveClientCredentials(client_response[1], client_response[2]);
-            addOnlineClient(client_response[1], sock);
+            if (!checkClientsCredentials(client_response[1], client_response[2], sock))
+            {
+                saveClientCredentials(client_response[1], client_response[2]);
+                addOnlineClient(client_response[1], sock);
+            }
+            else
+            {
+                sendToClient(sock, "\nUSER ALREADY REGISTERED");
+            }
+            
             client_response.clear();
         }
 
         if (client_response[0] == LOGIN)
         {
-            checkClientsCredentials(client_response[1], client_response[2], sock);
+            checkClientsCredentials(client_response[1], client_response[2], sock) 
+             ? sendToClient(sock, "LOGIN SUCCESS") 
+             : sendToClient(sock, "LOGIN FAILED");
+                    
             client_response.clear();
         }
 
