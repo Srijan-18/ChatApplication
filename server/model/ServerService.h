@@ -51,7 +51,7 @@ public:
     void exitClientMethod(int, vector<string>);
     void addOnlineClient(string, int);
     void saveClientCredentials(string, string);
-    void checkClientsCredentials(string, string, int);
+    bool checkClientsCredentials(string, string, int);
     vector<string> splitter(const string &, string);
     void createMessageFormat(vector<string> &, int);
     void *receiveInputFromClient(void *);
