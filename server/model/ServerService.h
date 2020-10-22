@@ -24,6 +24,7 @@ static vector<int> clients;
 
 
 static std::map<std::string, int> online_clients;
+static std::map<string,string> client_credentials;
 
 enum SERVICE_CONSTANTS
 {
@@ -49,7 +50,8 @@ public:
     void sendToAllClients(string, int);
     void exitClientMethod(int, vector<string>);
     void addOnlineClient(string, int);
-    void checkUserExists(string,int);
+    void saveClientCredentials(string, string);
+    void checkClientsCredentials(string, string, int);
     vector<string> splitter(const string &, string);
     void createMessageFormat(vector<string> &, int);
     void *receiveInputFromClient(void *);

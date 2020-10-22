@@ -28,6 +28,7 @@ void ServerService::acceptIncomingClients()
 {
     ServerService service;
     online_clients["Srijan"] = 0;
+    client_credentials["Srijan"] = "1234";
     while (1)
     {
         if ((client_socket = accept(sock, (struct sockaddr *)NULL, NULL)) < 0)
@@ -94,7 +95,7 @@ string ServerService::receiveFromClient(int sock)
 void ServerService::addOnlineClient(std::string client_name, int sock)
 {
     online_clients[client_name] = sock;
-    sendToClient(sock,"REGISTERED");
+    sendToClient(sock, "REGISTERED");
 }
 
 void ServerService::createMessageFormat(vector<string> &client_message, int sock)
@@ -113,15 +114,20 @@ void ServerService::createMessageFormat(vector<string> &client_message, int sock
     message.clear();
 }
 
-void ServerService::checkUserExists(string user_name, int sock)
+void ServerService::saveClientCredentials(string client_name, string client_password)
+{
+    client_credentials[client_name] = client_password;
+}
+
+void ServerService::checkClientsCredentials(string user_name, string password, int sock)
 {
     string result = "FAILED";
     cout << "Username : " << user_name << endl;
-    for (auto element : online_clients)
+    for (auto element : client_credentials)
     {
-        if (element.first == user_name)
+        if (element.first == user_name && element.second == password)
         {
-            element.second = sock;
+            online_clients[user_name] = sock;
             result = "SUCCESS";
             break;
         }
@@ -160,13 +166,14 @@ void *ServerService::receiveInputFromClient(void *client_sock)
         if (client_response[0] == REGISTER)
         {
             cout << "Registering " << client_response[1] << " ..." << endl;
+            saveClientCredentials(client_response[1], client_response[2]);
             addOnlineClient(client_response[1], sock);
             client_response.clear();
         }
 
         if (client_response[0] == LOGIN)
         {
-            checkUserExists(client_response[1], sock);
+            checkClientsCredentials(client_response[1], client_response[2], sock);
             client_response.clear();
         }
 
