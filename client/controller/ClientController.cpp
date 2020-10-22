@@ -48,6 +48,11 @@ public:
                 client_service.setClientPassword(client_view.getInputFor("Password"));
                 client_service.registerClient(socket, client_service.getClientName(), client_service.getClientPassword());
                 break;
+            case QUIT:
+                client_service.sendToServer(socket, "##EXIT>=");
+                exit(0);
+                break;
+
             default:
                 client_view.displayMessage("\n##  Invalid Input  ##");
                 break;
