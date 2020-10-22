@@ -10,26 +10,55 @@ class ClientController
     enum Input_Constants
     {
         TO_CHATROOM = 1,
-        QUIT = 9
+        QUIT = 9,
+        TO_REGISTER = 2,
+        TO_LOGIN = 1
     };
 
 public:
     void startChat()
     {
         bool end_key = true;
+        bool end_key_2 = false;
         client_view.printWelcomeMessage();
-        client_service.setClientName(client_view.getInputFor("User ID"));
         if (client_service.getConnectionStatus() != true)
         {
             exit(0);
         }
-        std::string name = client_service.getUserName();
+
         int socket = client_service.getSocketValue();
-        client_service.registerClient(socket, name);
+
+        std::string name;
+
+        while (!end_key_2)
+        {
+            int user_choice = client_view.selectAuthOption();
+            switch (user_choice)
+            {
+            case TO_LOGIN:
+                client_service.setClientName(client_view.getInputFor("User ID"));
+                name = client_service.getUserName();
+                end_key_2 = client_service.loginClient(socket, name);
+                if (end_key_2 == true)
+                {
+                    cout << "++++++LOGGED IN++++++" << endl;
+                }
+                break;
+            case TO_REGISTER:
+                client_service.setClientName(client_view.getInputFor("User ID"));
+                name = client_service.getUserName();
+                client_service.registerClient(socket, name);
+                break;
+            default:
+                client_view.displayMessage("\n##  Invalid Input  ##");
+                break;
+            }
+        }
+
         while (end_key)
         {
-            int user_choice = client_view.selectOption();
-            switch (user_choice)
+            int user_choice_2 = client_view.selectOption();
+            switch (user_choice_2)
             {
             case TO_CHATROOM:
             {
