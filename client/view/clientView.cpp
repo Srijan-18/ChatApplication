@@ -17,6 +17,7 @@ int ClientView::selectAuthOption()
 
     cout << "\n1 : Login\n"
          << "2 : Register\n"
+         << "9 : EXIT\n"
          << "\nYOUR CHOICE : ";
     cin >> choice;
     return choice;
