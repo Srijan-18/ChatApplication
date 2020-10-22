@@ -11,6 +11,7 @@ private:
 public:
     void printWelcomeMessage();
     int selectOption();
+    int selectAuthOption();
     void viewMessage(std::string);
     std::string getMessage();
     void setMessage();

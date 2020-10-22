@@ -4,8 +4,19 @@ int ClientView::selectOption()
 {
     int choice;
     cout << "\n***** USER OPTIONS *****\n"
-         <<"\n1 : To enter chat room\n"
+         << "\n1 : To enter chat room\n"
          << "9 : Exit\n"
+         << "\nYOUR CHOICE : ";
+    cin >> choice;
+    return choice;
+}
+
+int ClientView::selectAuthOption()
+{
+    int choice;
+
+    cout << "\n1 : Login\n"
+         << "2 : Register\n"
          << "\nYOUR CHOICE : ";
     cin >> choice;
     return choice;
