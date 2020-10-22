@@ -10,12 +10,12 @@ int ClientService::createConnection()
     return client_socket;
 }
 
-void ClientService::registerClient(int sock, std::string username)
+void ClientService::registerClient(int sock, std::string username, std::string password)
 {
     std::string send_to_client;
-    send_to_client = "REGISTER>=" + username + ">=";
+    send_to_client = "REGISTER>=" + username + ">=" + password;
     sendToServer(sock, send_to_client);
-    cout << receiveFromServer(sock) << endl; 
+    cout << receiveFromServer(sock) << endl;
 }
 
 bool ClientService::getConnectionStatus()
@@ -31,10 +31,6 @@ int ClientService::getSocketValue()
     return client_socket;
 }
 
-std::string ClientService::getUserName()
-{
-    return client_name;
-}
 
 void ClientService::chatroomMessage()
 {
@@ -94,13 +90,28 @@ void ClientService::setClientName(std::string o_client_name)
     client_name = o_client_name;
 }
 
-bool ClientService::loginClient(int socket, string client_name)
+void ClientService::setClientPassword(std::string password)
+{
+    client_password = password;
+}
+
+std::string ClientService::getClientName()
+{
+    return client_name;
+}
+
+std::string ClientService::getClientPassword()
+{
+    return client_password;
+}
+
+bool ClientService::loginClient(int socket, string client_name, string password)
 {
     std::string send_to_server;
-    send_to_server = "LOGIN>=" + client_name + ">=";
+    send_to_server = "LOGIN>=" + client_name + ">=" + password;
     sendToServer(socket, send_to_server);
     string server_response = receiveFromServer(socket);
-    if (server_response.find("SUCCESS")!= std::string::npos)
+    if (server_response.find("SUCCESS") != std::string::npos)
     {
         return true;
     }

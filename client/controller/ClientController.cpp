@@ -37,17 +37,16 @@ public:
             {
             case TO_LOGIN:
                 client_service.setClientName(client_view.getInputFor("User ID"));
-                name = client_service.getUserName();
-                end_key_2 = client_service.loginClient(socket, name);
-                if (end_key_2 == true)
-                {
-                    cout << "++++++LOGGED IN++++++" << endl;
-                }
+                client_service.setClientPassword(client_view.getInputFor("Password"));
+                end_key_2 = client_service.loginClient(socket, client_service.getClientName(), client_service.getClientPassword());
+
+                end_key_2 ? cout << "\n++++++LOGGED IN++++++" << endl
+                          : cout << "\nInavlid user name or password" << endl;
                 break;
             case TO_REGISTER:
                 client_service.setClientName(client_view.getInputFor("User ID"));
-                name = client_service.getUserName();
-                client_service.registerClient(socket, name);
+                client_service.setClientPassword(client_view.getInputFor("Password"));
+                client_service.registerClient(socket, client_service.getClientName(), client_service.getClientPassword());
                 break;
             default:
                 client_view.displayMessage("\n##  Invalid Input  ##");

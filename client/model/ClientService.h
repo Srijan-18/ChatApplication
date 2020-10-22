@@ -32,9 +32,10 @@ private:
     pthread_t receiving_thread;
     int length;
     int socket_value;
-    
+
     struct sockaddr_in ServerIp;
     std::string client_name;
+    std::string client_password;
     std::string delimiter = ">=";
 
 public:
@@ -42,10 +43,12 @@ public:
     bool getConnectionStatus();
     void chatroomMessage();
     void closeConnection();
-    void registerClient(int, std::string);
-    bool loginClient(int, string);
+    void registerClient(int, std::string, std::string);
+    bool loginClient(int, string, string);
+    void setClientPassword(std::string);
     int getSocketValue();
-    std::string getUserName();
+    std::string getClientName();
+    std::string getClientPassword();
     void setClientName(std::string);
     void sendToServer(int, std::string);
     std::string receiveFromServer(int);
