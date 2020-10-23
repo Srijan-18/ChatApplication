@@ -61,17 +61,18 @@ public:
 
         while (end_key)
         {
+            client_view.printOnlineClients(client_service.getOnlineClients());
             int user_choice_2 = client_view.selectOption();
             switch (user_choice_2)
             {
             case TO_CHATROOM:
             {
                 client_service.chatroomMessage();
-                client_service.closeConnection();
             }
             break;
             case QUIT:
                 end_key = false;
+                client_service.closeConnection();
                 break;
             default:
                 client_view.displayMessage("\n##  Invalid Input  ##");
