@@ -60,3 +60,11 @@ string ClientView::getInputFor(string requiredInput)
     cin >> input;
     return input;
 }
+
+void ClientView::printOnlineClients(vector<string> online_clients)
+{
+    for(auto online_client : online_clients)
+    {
+        cout << online_client << endl;
+    }
+}

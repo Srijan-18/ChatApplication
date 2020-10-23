@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <string>
+#include <vector>
 using namespace std;
 class ClientView
 {
@@ -17,4 +18,5 @@ public:
     void setMessage();
     void displayMessage(string);
     string getInputFor(string);
+    void printOnlineClients(vector<string>);
 };
