@@ -10,21 +10,20 @@
 #include <sstream>
 #include <vector>
 #include <istream>
+#include "../../client/model/ClientStructure.cpp"
+#include "../../utility/stringUtility.cpp"
 
 #define REGISTER "REGISTER"
 #define CHATROOM "CHATROOM"
 #define LOGIN "LOGIN"
+#define ONLINE_CLIENTS "ONLINE"
 #define EXIT "##EXIT"
 
 using namespace std;
 
 static int client_socket;
 static vector<int> clients;
-
-
-
-static std::map<std::string, int> online_clients;
-static std::map<string,string> client_credentials;
+static vector<Client> client_data;
 
 enum SERVICE_CONSTANTS
 {
@@ -36,7 +35,7 @@ enum SERVICE_CONSTANTS
 class ServerService
 {
     pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-
+    Client client_ref;
     struct sockaddr_in ServerIp;
     pthread_t recvt;
     int sock = 0;
@@ -49,8 +48,9 @@ public:
     string receiveFromClient(int);
     void sendToAllClients(string, int);
     void exitClientMethod(int, vector<string>);
-    void addOnlineClient(string, int);
-    void saveClientCredentials(string, string);
+    void addOnlineClient(string);
+    bool checkOnline(string);
+    void saveClientCredentials(string, string, int);
     bool checkClientsCredentials(string, string, int);
     vector<string> splitter(const string &, string);
     void createMessageFormat(vector<string> &, int);

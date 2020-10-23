@@ -27,8 +27,6 @@ bool ServerService::getConnectionStatus()
 void ServerService::acceptIncomingClients()
 {
     ServerService service;
-    online_clients["Srijan"] = 0;
-    client_credentials["Srijan"] = "1234";
     while (1)
     {
         if ((client_socket = accept(sock, (struct sockaddr *)NULL, NULL)) < 0)
@@ -74,11 +72,11 @@ void ServerService::exitClientMethod(int sock, vector<string> messageVector)
             clients[i] = -1;
         }
     }
-    for (auto element : online_clients)
+    for (auto element : client_data)
     {
-        if (element.second == sock)
+        if (element.socket == sock)
         {
-            online_clients.erase(element.first);
+            element.online_status = false;
             break;
         }
     }
@@ -92,11 +90,16 @@ string ServerService::receiveFromClient(int sock)
     return std::string(msg);
 }
 
-void ServerService::addOnlineClient(std::string client_name, int sock)
+void ServerService::addOnlineClient(std::string client_name)
 {
-    online_clients[client_name] = sock;
-    sendToClient(sock, "\nREGISTERATION SUCCESSFUL");
-
+    for (auto client_iterator = client_data.begin(); client_iterator != client_data.end(); client_iterator++)
+    {
+        if (client_iterator->name == client_name)
+        {
+            client_iterator->online_status = true;
+            break;
+        }
+    }
 }
 
 void ServerService::createMessageFormat(vector<string> &client_message, int sock)
@@ -115,41 +118,40 @@ void ServerService::createMessageFormat(vector<string> &client_message, int sock
     message.clear();
 }
 
-void ServerService::saveClientCredentials(string client_name, string client_password)
+void ServerService::saveClientCredentials(string client_name, string client_password, int socket)
 {
-    client_credentials[client_name] = client_password;
+    client_ref.socket = socket;
+    client_ref.name = client_name;
+    client_ref.password = client_password;
+    client_data.push_back(client_ref);
+    sendToClient(socket, "\nREGISTERATION SUCCESSFUL");
+}
+
+bool ServerService::checkOnline(string name)
+{
+    for (auto client_iterator = client_data.begin(); client_iterator != client_data.end(); client_iterator++)
+    {
+        if (client_iterator->name == name && client_iterator->online_status)
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 bool ServerService::checkClientsCredentials(string user_name, string password, int sock)
 {
     bool client_duplication = false;
     cout << user_name << " Logged In." << endl;
-    for (auto element : client_credentials)
+    for (auto client_iterator = client_data.begin(); client_iterator != client_data.end(); client_iterator++)
     {
-        if (element.first == user_name && element.second == password)
+        if (client_iterator->name == user_name)
         {
-            online_clients[user_name] = sock;
             client_duplication = true;
             break;
         }
     }
     return client_duplication;
-}
-
-std::vector<std::string> ServerService::splitter(const std::string &client_response, std::string delimiter)
-{
-    size_t pos_start = 0, pos_end, delim_len = delimiter.length();
-    std::string token;
-    std::vector<std::string> res;
-
-    while ((pos_end = client_response.find(delimiter, pos_start)) != std::string::npos)
-    {
-        token = client_response.substr(pos_start, pos_end - pos_start);
-        pos_start = pos_end + delim_len;
-        res.push_back(token);
-    }
-    res.push_back(client_response.substr(pos_start));
-    return res;
 }
 
 void *ServerService::receiveInputFromClient(void *client_sock)
@@ -162,30 +164,49 @@ void *ServerService::receiveInputFromClient(void *client_sock)
     while (1)
     {
         std::string received_from_client = receiveFromClient(sock);
-        std::vector<std::string> client_response = splitter(received_from_client, delimiter);
+        std::vector<std::string> client_response = StringUtility::splitter(received_from_client, delimiter);
 
         if (client_response[0] == REGISTER)
         {
             cout << "Registering " << client_response[1] << " ..." << endl;
             if (!checkClientsCredentials(client_response[1], client_response[2], sock))
             {
-                saveClientCredentials(client_response[1], client_response[2]);
-                addOnlineClient(client_response[1], sock);
+                saveClientCredentials(client_response[1], client_response[2], sock);
             }
             else
             {
                 sendToClient(sock, "\nUSER ALREADY REGISTERED");
             }
-            
+
             client_response.clear();
         }
-
+        if (client_response[0] == ONLINE_CLIENTS)
+        {
+            string onlineUsers = "No clients online";
+            for (auto client_iterator = client_data.begin(); client_iterator != client_data.end(); client_iterator++)
+            {
+                if (client_iterator->online_status && client_iterator->socket != sock)
+                {
+                    onlineUsers = onlineUsers + delimiter + client_iterator->name;
+                }
+            }
+            sendToClient(sock, onlineUsers);
+        }
         if (client_response[0] == LOGIN)
         {
-            checkClientsCredentials(client_response[1], client_response[2], sock) 
-             ? sendToClient(sock, "LOGIN SUCCESS") 
-             : sendToClient(sock, "LOGIN FAILED");
-                    
+            if (!checkOnline(client_response[1]))
+            {
+                if (checkClientsCredentials(client_response[1], client_response[2], sock))
+                {
+                    sendToClient(sock, "LOGIN SUCCESS");
+                    addOnlineClient(client_response[1]);
+                }
+                else
+                    sendToClient(sock, "LOGIN FAILED");
+            }
+            else
+                sendToClient(sock, "USERONLINE");
+
             client_response.clear();
         }
 
