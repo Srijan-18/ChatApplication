@@ -41,7 +41,7 @@ public:
                 end_key_2 = client_service.loginClient(socket, client_service.getClientName(), client_service.getClientPassword());
 
                 end_key_2 ? cout << "\n++++++LOGGED IN++++++" << endl
-                          : cout << "\nInavlid user name or password" << endl;
+                          : cout << "\nInvalid user name or password" << endl;
                 break;
             case TO_REGISTER:
                 client_service.setClientName(client_view.getInputFor("User ID"));
