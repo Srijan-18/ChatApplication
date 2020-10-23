@@ -12,6 +12,7 @@
 #include <istream>
 #include "../../client/model/ClientStructure.cpp"
 #include "../../utility/stringUtility.cpp"
+#include "../mongodb/DBOperations.h"
 
 #define REGISTER "REGISTER"
 #define CHATROOM "CHATROOM"
@@ -39,6 +40,8 @@ class ServerService
     struct sockaddr_in ServerIp;
     pthread_t recvt;
     int sock = 0;
+    MongoDB mongo_obj;
+
 
 public:
     int createConnection();
@@ -51,7 +54,8 @@ public:
     void addOnlineClient(string);
     bool checkOnline(string);
     void saveClientCredentials(string, string, int);
-    bool checkClientsCredentials(string, string, int);
+    bool checkClientsCredentials(string, string);
+    bool findGivenUser(string);
     vector<string> splitter(const string &, string);
     void createMessageFormat(vector<string> &, int);
     void *receiveInputFromClient(void *);

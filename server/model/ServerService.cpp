@@ -124,6 +124,7 @@ void ServerService::saveClientCredentials(string client_name, string client_pass
     client_ref.name = client_name;
     client_ref.password = client_password;
     client_data.push_back(client_ref);
+    mongo_obj.saveGivenUser(client_name, client_password);
     sendToClient(socket, "\nREGISTERATION SUCCESSFUL");
 }
 
@@ -139,19 +140,19 @@ bool ServerService::checkOnline(string name)
     return false;
 }
 
-bool ServerService::checkClientsCredentials(string user_name, string password, int sock)
+bool ServerService::findGivenUser(string userID)
 {
-    bool client_duplication = false;
-    cout << user_name << " Logged In." << endl;
-    for (auto client_iterator = client_data.begin(); client_iterator != client_data.end(); client_iterator++)
-    {
-        if (client_iterator->name == user_name)
-        {
-            client_duplication = true;
-            break;
-        }
-    }
-    return client_duplication;
+    cout << "Searching for " << userID  << " in data base"<< endl;
+    bool result = mongo_obj.checkUserPresence(userID);
+    result ? cout << userID << " found." << endl : cout << userID << " not found" << endl;
+  
+    return result;
+}
+
+bool ServerService::checkClientsCredentials(string userID, string password)
+{
+    cout << "Validating userID and passowrd for " << userID << endl;
+    return mongo_obj.authenticateUser(userID, password);
 }
 
 void *ServerService::receiveInputFromClient(void *client_sock)
@@ -168,15 +169,10 @@ void *ServerService::receiveInputFromClient(void *client_sock)
 
         if (client_response[0] == REGISTER)
         {
-            cout << "Registering " << client_response[1] << " ..." << endl;
-            if (!checkClientsCredentials(client_response[1], client_response[2], sock))
-            {
+            if (!findGivenUser(client_response[1]))
                 saveClientCredentials(client_response[1], client_response[2], sock);
-            }
             else
-            {
                 sendToClient(sock, "\nUSER ALREADY REGISTERED");
-            }
 
             client_response.clear();
         }
@@ -196,7 +192,7 @@ void *ServerService::receiveInputFromClient(void *client_sock)
         {
             if (!checkOnline(client_response[1]))
             {
-                if (checkClientsCredentials(client_response[1], client_response[2], sock))
+                if (checkClientsCredentials(client_response[1], client_response[2]))
                 {
                     sendToClient(sock, "LOGIN SUCCESS");
                     addOnlineClient(client_response[1]);
