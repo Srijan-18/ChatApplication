@@ -2,11 +2,6 @@
 
 using namespace std;
 
-void ServerController::printWelcomeMessage()
-{
-    server_view.printWelcomeMessage();
-}
-
 void ServerController::startServer()
 {
     if(server_service.getConnectionStatus() == true)
