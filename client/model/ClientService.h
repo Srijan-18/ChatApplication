@@ -10,6 +10,7 @@
 #include <vector>
 #include <thread>
 #include <mutex>
+#include "../../utility/stringUtility.cpp"
 
 using namespace std;
 
@@ -31,7 +32,7 @@ class ClientService
 private:
     pthread_t receiving_thread;
     int length;
-    int socket_value;
+    //int socket_value;
 
     struct sockaddr_in ServerIp;
     std::string client_name;
@@ -56,6 +57,7 @@ public:
     std::string getMessage();
     void exitMethod();
     static void setMessage(std::string);
+    vector<string> getOnlineClients();
     static void *message_helper(void *context)
     {
         return ((ClientService *)context)->recv_message(&client_socket);

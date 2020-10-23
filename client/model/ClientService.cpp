@@ -6,7 +6,7 @@ int ClientService::createConnection()
     ServerIp.sin_port = htons(47896);
     ServerIp.sin_family = AF_INET;
     ServerIp.sin_addr.s_addr = INADDR_ANY;
-    socket_value = connect(client_socket, (struct sockaddr *)&ServerIp, sizeof(ServerIp));
+    connect(client_socket, (struct sockaddr *)&ServerIp, sizeof(ServerIp));
     return client_socket;
 }
 
@@ -31,13 +31,23 @@ int ClientService::getSocketValue()
     return client_socket;
 }
 
+vector<string> ClientService::getOnlineClients()
+{
+    sleep(1);
+    sendToServer(client_socket, "ONLINE>=");
+    string server_respone = receiveFromServer(client_socket);
+    vector<string> response = StringUtility::splitter(server_respone, ">=");
+    if (response.size() > 1)
+        response.erase(response.begin());
+    return response;
+}
 
 void ClientService::chatroomMessage()
 {
     pthread_t recvt;
     ClientService service;
     std::string send_msg;
-    std::string group_chat = CHATROOM + delimiter;
+    std::string chatroom_chat = CHATROOM + delimiter;
     int flag = 0;
     int pos = 0;
     pthread_create(&recvt, NULL, message_helper, &service);
@@ -51,13 +61,13 @@ void ClientService::chatroomMessage()
         }
         else
         {
-            send_msg = group_chat + client_name + ":" + delimiter + std::string(message);
+            send_msg = chatroom_chat + client_name + ":" + delimiter + std::string(message);
         }
 
         if (send_msg.find(EXIT) != std::string::npos)
         {
             send_msg.clear();
-            send_msg = EXIT + delimiter + client_name + delimiter + " has left the chat";
+            send_msg = EXIT + delimiter + client_name + delimiter + " has left the chat\n";
             sendToServer(client_socket, send_msg);
             break;
         }
@@ -108,14 +118,20 @@ std::string ClientService::getClientPassword()
 bool ClientService::loginClient(int socket, string client_name, string password)
 {
     std::string send_to_server;
+    bool login_status = false;
     send_to_server = "LOGIN>=" + client_name + ">=" + password;
     sendToServer(socket, send_to_server);
     string server_response = receiveFromServer(socket);
     if (server_response.find("SUCCESS") != std::string::npos)
     {
-        return true;
+        login_status = true;
     }
-    return false;
+    else if (server_response.find("USERONLINE") != std::string::npos)
+    {
+        cout << "\n"
+             << client_name << " already logged in." << endl;
+    }
+    return login_status;
 }
 
 void *ClientService::recv_message(void *my_sock)
