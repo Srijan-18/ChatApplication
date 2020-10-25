@@ -32,7 +32,7 @@ void ServerService::acceptIncomingClients()
         if ((client_socket = accept(sock, (struct sockaddr *)NULL, NULL)) < 0)
             printf("[-]Accept failed  \n");
         pthread_mutex_lock(&mutex);
-        clients.push_back(client_socket);
+        //clients.push_back(client_socket);
         //creating a thread for each client
         pthread_create(&recvt, NULL, &threadReferenceHelper, &service);
         pthread_mutex_unlock(&mutex);
@@ -48,12 +48,16 @@ void ServerService::sendToAllClients(string message, int current_sock)
 {
     int client;
     pthread_mutex_lock(&mutex);
-    for (client = 0; client < clients.size(); client++)
+
+    for (auto client_iterator = client_data.begin(); client_iterator != client_data.end(); client_iterator++)
     {
-        if (clients[client] > MIN_SOCKET_VALUE && clients[client] != current_sock)
+        if (client_iterator->chatroom_status && client_iterator->online_status)
         {
+            if (client_iterator->socket != current_sock)
             {
-                sendToClient(clients[client], message);
+                {
+                    sendToClient(client_iterator->socket, message);
+                }
             }
         }
     }
@@ -62,22 +66,15 @@ void ServerService::sendToAllClients(string message, int current_sock)
 
 void ServerService::exitClientMethod(int sock, vector<string> messageVector)
 {
-
     string message = messageVector[1] + messageVector[2];
     sendToAllClients(message, sock);
-    for (int i = 0; i < clients.size(); i++)
+
+    for (auto client_iterator = client_data.begin(); client_iterator != client_data.end(); client_iterator++)
     {
-        if (clients[i] == sock)
+        if (client_iterator->chatroom_status && client_iterator->online_status)
         {
-            clients[i] = -1;
-        }
-    }
-    for (auto element : client_data)
-    {
-        if (element.socket == sock)
-        {
-            element.online_status = false;
-            break;
+            if (client_iterator->socket == sock)
+                client_iterator->chatroom_status = false;
         }
     }
 }
@@ -90,16 +87,13 @@ string ServerService::receiveFromClient(int sock)
     return std::string(msg);
 }
 
-void ServerService::addOnlineClient(std::string client_name)
+void ServerService::addOnlineClient(std::string client_name, int sock)
 {
-    for (auto client_iterator = client_data.begin(); client_iterator != client_data.end(); client_iterator++)
-    {
-        if (client_iterator->name == client_name)
-        {
-            client_iterator->online_status = true;
-            break;
-        }
-    }
+    Client client_ref;
+    client_ref.socket = sock;
+    client_ref.name = client_name;
+    client_ref.online_status = true;
+    client_data.push_back(client_ref);
 }
 
 void ServerService::createMessageFormat(vector<string> &client_message, int sock)
@@ -120,12 +114,20 @@ void ServerService::createMessageFormat(vector<string> &client_message, int sock
 
 void ServerService::saveClientCredentials(string client_name, string client_password, int socket)
 {
-    client_ref.socket = socket;
-    client_ref.name = client_name;
-    client_ref.password = client_password;
-    client_data.push_back(client_ref);
     mongo_obj.saveGivenUser(client_name, client_password);
     sendToClient(socket, "\nREGISTERATION SUCCESSFUL");
+}
+
+void ServerService::setChatroomStatus(int sock)
+{
+    for (auto client_iterator = client_data.begin(); client_iterator != client_data.end(); client_iterator++)
+    {
+        cout << "Name : " << client_iterator->name << endl;
+        if (client_iterator->socket == sock && client_iterator->online_status)
+        {
+            client_iterator->chatroom_status = true;
+        }
+    }
 }
 
 bool ServerService::checkOnline(string name)
@@ -142,23 +144,48 @@ bool ServerService::checkOnline(string name)
 
 bool ServerService::findGivenUser(string userID)
 {
-    cout << "Searching for " << userID  << " in data base"<< endl;
+    cout << "Searching for " << userID << " in data base" << endl;
     bool result = mongo_obj.checkUserPresence(userID);
     result ? cout << userID << " found." << endl : cout << userID << " not found" << endl;
-  
+
     return result;
 }
 
 bool ServerService::checkClientsCredentials(string userID, string password)
 {
-    cout << "Validating userID and passowrd for " << userID << endl;
+    cout << "Validating userID and password for " << userID << endl;
     return mongo_obj.authenticateUser(userID, password);
+}
+
+void ServerService::removeClientFromServer(int sock)
+{
+    for (auto client_iterator = client_data.begin(); client_iterator != client_data.end(); client_iterator++)
+    {
+        if (client_iterator->socket == sock)
+        {
+            cout << " Name: " << client_iterator->name << " removed" << endl;
+            client_data.erase(client_iterator);
+            break;
+        }
+    }
+}
+
+void ServerService::getChatroomClients(string name, int sock)
+{
+    for (int i = 0; i < client_data.size(); i++)
+    {
+        if (client_data[i].socket != sock && client_data[i].chatroom_status)
+        {
+            string temp = client_data[i].name + " joined the chat\n";
+            sendToClient(sock, temp);
+        }
+    }
 }
 
 void *ServerService::receiveInputFromClient(void *client_sock)
 {
     int sock = *((int *)client_sock);
-
+    int flag = 0;
     int len;
     char client_name[10];
     std::string delimiter = ">=";
@@ -194,8 +221,9 @@ void *ServerService::receiveInputFromClient(void *client_sock)
             {
                 if (checkClientsCredentials(client_response[1], client_response[2]))
                 {
+
                     sendToClient(sock, "LOGIN SUCCESS");
-                    addOnlineClient(client_response[1]);
+                    addOnlineClient(client_response[1], sock);
                 }
                 else
                     sendToClient(sock, "LOGIN FAILED");
@@ -206,14 +234,35 @@ void *ServerService::receiveInputFromClient(void *client_sock)
             client_response.clear();
         }
 
-        if (client_response[0] == EXIT)
+        if (client_response[0] == BACK)
         {
-            exitClientMethod(sock, client_response);
+            if (flag == 1)
+            {
+                exitClientMethod(sock, client_response);
+                flag = 0;
+            }
+        }
+
+        if (client_response[0] == QUIT)
+        {
+            removeClientFromServer(sock);
         }
 
         if (client_response[0] == CHATROOM)
         {
-            createMessageFormat(client_response, sock);
+            if (flag == 0)
+            {
+                flag = 1;
+                string temp;
+                temp = client_response[1] + " " + "joined the chat\n";
+                sendToAllClients(temp, sock);
+                setChatroomStatus(sock);
+                getChatroomClients(client_response[1], sock);
+            }
+            else
+            {
+                createMessageFormat(client_response, sock);
+            }
         }
         received_from_client.clear();
     }

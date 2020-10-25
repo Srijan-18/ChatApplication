@@ -13,12 +13,14 @@
 #include "../../client/model/ClientStructure.cpp"
 #include "../../utility/stringUtility.cpp"
 #include "../mongodb/DBOperations.h"
+#include <algorithm>
 
 #define REGISTER "REGISTER"
 #define CHATROOM "CHATROOM"
 #define LOGIN "LOGIN"
 #define ONLINE_CLIENTS "ONLINE"
-#define EXIT "##EXIT"
+#define BACK "##BACK"
+#define QUIT "#!EXIT"
 
 using namespace std;
 
@@ -36,7 +38,6 @@ enum SERVICE_CONSTANTS
 class ServerService
 {
     pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-    Client client_ref;
     struct sockaddr_in ServerIp;
     pthread_t recvt;
     int sock = 0;
@@ -51,14 +52,17 @@ public:
     string receiveFromClient(int);
     void sendToAllClients(string, int);
     void exitClientMethod(int, vector<string>);
-    void addOnlineClient(string);
+    void addOnlineClient(string,int);
     bool checkOnline(string);
     void saveClientCredentials(string, string, int);
     bool checkClientsCredentials(string, string);
     bool findGivenUser(string);
     vector<string> splitter(const string &, string);
     void createMessageFormat(vector<string> &, int);
+    void setChatroomStatus(int);
+    void removeClientFromServer(int);
     void *receiveInputFromClient(void *);
+    void getChatroomClients(string, int);
     static void *threadReferenceHelper(void *context)
     {
         return ((ServerService *)context)->receiveInputFromClient(&client_socket);
