@@ -5,7 +5,10 @@ int ClientView::selectOption()
     int choice;
     cout << "\n***** USER OPTIONS *****\n"
          << "\n1 : To enter chat room\n"
-         << "9 : Exit\n"
+         << "2 : Chat with one client\n"
+         << "3 : Show online clients\n"
+         << "8 : LOGOUT\n"
+         << "9 : EXIT\n"
          << "\nYOUR CHOICE : ";
     cin >> choice;
     return choice;

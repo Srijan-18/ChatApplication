@@ -9,5 +9,4 @@ int main()
     mongocxx::instance instance{};
     ServerController server_controller;
     server_controller.startServer();
-   }
-
+}
