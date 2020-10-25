@@ -65,6 +65,6 @@ void ClientView::printOnlineClients(vector<string> online_clients)
 {
     for(auto online_client : online_clients)
     {
-        cout << online_client << endl;
+        cout << "\n" << online_client << endl;
     }
 }
