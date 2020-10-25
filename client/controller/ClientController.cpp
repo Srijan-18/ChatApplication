@@ -10,14 +10,18 @@ class ClientController
     enum Input_Constants
     {
         TO_CHATROOM = 1,
+        ONLINE_CLIENTS = 3,
         QUIT = 9,
         TO_REGISTER = 2,
-        TO_LOGIN = 1
+        TO_LOGIN = 1,
+        TO_ONE_CLIENT = 2,
+        TO_LOGOUT = 8
     };
 
 public:
     void startChat()
     {
+        system("clear");
         bool end_key = true;
         bool end_key_2 = false;
         client_view.printWelcomeMessage();
@@ -40,8 +44,9 @@ public:
                 client_service.setClientPassword(client_view.getInputFor("Password"));
                 end_key_2 = client_service.loginClient(socket, client_service.getClientName(), client_service.getClientPassword());
 
-                end_key_2 ? cout << "\n++++++LOGGED IN++++++" << endl
+                end_key_2 ? cout << "\n++++++LOGGED IN++++++"<< endl
                           : cout << "\nInvalid user name or password" << endl;
+                sleep(2);
                 break;
             case TO_REGISTER:
                 client_service.setClientName(client_view.getInputFor("User ID"));
@@ -60,23 +65,43 @@ public:
         }
 
         while (end_key)
-        {
+        {   system("clear");
+            cout << "Online : " << client_service.getClientName() << endl;
             int user_choice_2 = client_view.selectOption();
             switch (user_choice_2)
             {
-            case TO_CHATROOM:
-            {
-                client_service.chatroomMessage();
-            }
-            break;
-            case QUIT:
-                client_service.sendToServer(socket, "#!EXIT>=");
-                end_key = false;
-                client_service.closeConnection();
+                case TO_CHATROOM:
+                {
+                    client_service.chatroomMessage();
+                }
                 break;
-            default:
-                client_view.displayMessage("\n##  Invalid Input  ##");
+                case TO_ONE_CLIENT:
+                {
+                    string other_client = client_view.getInputFor("Other User ID");
+                    client_service.oneToOneMessage(other_client);
+                }
                 break;
+                case ONLINE_CLIENTS:
+                {
+                    client_view.printOnlineClients(client_service.getOnlineClients());
+                }
+                break;
+                case QUIT:
+                    client_service.sendToServer(socket, "#!EXIT>=");
+                    end_key = false;
+                    client_service.closeConnection();
+                    break;
+                case TO_LOGOUT:
+                {
+                    client_service.sendToServer(socket, "#!EXIT>=");
+                    end_key = false;
+                    client_service.closeConnection();
+                    startChat();
+                }
+                break;
+                default:
+                    client_view.displayMessage("\n##  Invalid Input  ##");
+                    break;
             }
         }
     }
