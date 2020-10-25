@@ -49,7 +49,7 @@ public:
                 client_service.registerClient(socket, client_service.getClientName(), client_service.getClientPassword());
                 break;
             case QUIT:
-                client_service.sendToServer(socket, "##EXIT>=");
+                client_service.sendToServer(socket, "#!EXIT>=");
                 exit(0);
                 break;
 
@@ -61,7 +61,6 @@ public:
 
         while (end_key)
         {
-            client_view.printOnlineClients(client_service.getOnlineClients());
             int user_choice_2 = client_view.selectOption();
             switch (user_choice_2)
             {
@@ -71,6 +70,7 @@ public:
             }
             break;
             case QUIT:
+                client_service.sendToServer(socket, "#!EXIT>=");
                 end_key = false;
                 client_service.closeConnection();
                 break;
