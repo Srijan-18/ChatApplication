@@ -17,6 +17,7 @@ using namespace std;
 #define PORT 50001
 #define CHATROOM "CHATROOM"
 #define BACK "##BACK"
+#define CONNECT "CONNECT"
 
 static char message[100];
 static int client_socket;
@@ -32,7 +33,6 @@ class ClientService
 private:
     pthread_t receiving_thread;
     int length;
-    //int socket_value;
 
     struct sockaddr_in ServerIp;
     std::string client_name;
@@ -58,6 +58,7 @@ public:
     void exitMethod();
     static void setMessage(std::string);
     vector<string> getOnlineClients();
+    void oneToOneMessage(string);
     static void *message_helper(void *context)
     {
         return ((ClientService *)context)->recv_message(&client_socket);

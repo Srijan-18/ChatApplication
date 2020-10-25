@@ -8,4 +8,5 @@ struct Client
     string password;
     bool online_status = false;
     bool chatroom_status = false;
+    bool individual_chat = false;
 };

@@ -78,6 +78,44 @@ void ClientService::chatroomMessage()
     pthread_detach(pthread_self());
 }
 
+void ClientService::oneToOneMessage(string other_client)
+{
+    std::string delimiter = ">=";
+    std::string send_msg;
+    pthread_t recvt;
+    int flag = 0;
+    ClientService service;
+    pthread_create(&recvt, NULL, message_helper, &service);
+    memset(message, 0, sizeof(message));
+    while (fgets(message, sizeof(message), stdin) > 0)
+    {
+        if (flag == 0)
+        {
+            send_msg = CONNECT + delimiter + client_name + ">=" + "Connecting to : " + other_client + "\n";
+            flag = 1;
+        }
+        else
+        {
+            send_msg = CONNECT + delimiter + other_client + delimiter + client_name + ":" + delimiter + std::string(message);
+        }
+
+        if (send_msg.find(BACK) != std::string::npos)
+        {
+            flag = 0;
+            send_msg.clear();
+            send_msg = BACK + delimiter + client_name + delimiter + " has left the chat\n" + delimiter + CONNECT;
+            sendToServer(client_socket, send_msg);
+            break;
+        }
+
+        sendToServer(client_socket, send_msg);
+        bzero(message, sizeof(message));
+        send_msg.clear();
+        std::cout << "\n";
+    }
+    pthread_detach(pthread_self());
+}
+
 void ClientService::closeConnection()
 {
     close(client_socket);
