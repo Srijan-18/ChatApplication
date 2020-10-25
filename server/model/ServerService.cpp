@@ -32,7 +32,6 @@ void ServerService::acceptIncomingClients()
         if ((client_socket = accept(sock, (struct sockaddr *)NULL, NULL)) < 0)
             printf("[-]Accept failed  \n");
         pthread_mutex_lock(&mutex);
-        //clients.push_back(client_socket);
         //creating a thread for each client
         pthread_create(&recvt, NULL, &threadReferenceHelper, &service);
         pthread_mutex_unlock(&mutex);
@@ -48,18 +47,22 @@ void ServerService::sendToAllClients(string message, int current_sock)
 {
     int client;
     pthread_mutex_lock(&mutex);
-
     for (auto client_iterator = client_data.begin(); client_iterator != client_data.end(); client_iterator++)
     {
-        if (client_iterator->chatroom_status && client_iterator->online_status)
-        {
-            if (client_iterator->socket != current_sock)
-            {
-                {
-                    sendToClient(client_iterator->socket, message);
-                }
-            }
-        }
+        if (client_iterator->chatroom_status && client_iterator->online_status && client_iterator->socket != current_sock)
+            sendToClient(client_iterator->socket, message);
+    }
+    pthread_mutex_unlock(&mutex);
+}
+
+void ServerService::sendToOne(std::string msg, int socket, string other_client_name)
+{
+    pthread_mutex_lock(&mutex);
+    for (auto client_iterator = client_data.begin(); client_iterator != client_data.end(); client_iterator++)
+    {
+        if (client_iterator->online_status)
+            if (client_iterator->name == other_client_name && client_iterator->individual_chat)
+                sendToClient(client_iterator->socket, msg);
     }
     pthread_mutex_unlock(&mutex);
 }
@@ -67,14 +70,19 @@ void ServerService::sendToAllClients(string message, int current_sock)
 void ServerService::exitClientMethod(int sock, vector<string> messageVector)
 {
     string message = messageVector[1] + messageVector[2];
-    sendToAllClients(message, sock);
-
     for (auto client_iterator = client_data.begin(); client_iterator != client_data.end(); client_iterator++)
     {
-        if (client_iterator->chatroom_status && client_iterator->online_status)
+        if (client_iterator->socket == sock && client_iterator->online_status)
         {
-            if (client_iterator->socket == sock)
+            if (messageVector[messageVector.size() - 1] == CONNECT)
+            {
+                client_iterator->individual_chat = false;
+            }
+            else
+            {
                 client_iterator->chatroom_status = false;
+                sendToAllClients(message, sock);
+            }
         }
     }
 }
@@ -109,6 +117,18 @@ void ServerService::createMessageFormat(vector<string> &client_message, int sock
         client_name = client_message[1];
         sendToAllClients(message, sock);
     }
+
+    if (client_message[0] == CONNECT)
+    {
+        for (int i = 2; i < client_message.size(); i++)
+        {
+            cout << "message format section : " << client_message[i];
+            message += client_message[i] + " ";
+        }
+        client_name = client_message[1];
+        sendToOne(message, sock, client_message[1]);
+    }
+
     message.clear();
 }
 
@@ -126,6 +146,18 @@ void ServerService::setChatroomStatus(int sock)
         if (client_iterator->socket == sock && client_iterator->online_status)
         {
             client_iterator->chatroom_status = true;
+        }
+    }
+}
+
+void ServerService::setIndividualChatStatus(int sock)
+{
+    for (auto client_iterator = client_data.begin(); client_iterator != client_data.end(); client_iterator++)
+    {
+        cout << "Name : " << client_iterator->name << endl;
+        if (client_iterator->socket == sock && client_iterator->online_status)
+        {
+            client_iterator->individual_chat = true;
         }
     }
 }
@@ -263,6 +295,16 @@ void *ServerService::receiveInputFromClient(void *client_sock)
             {
                 createMessageFormat(client_response, sock);
             }
+        }
+
+        if (client_response[0] == CONNECT)
+        {
+            if (flag == 0)
+            {
+                flag = 1;
+                setIndividualChatStatus(sock);
+            }
+            createMessageFormat(client_response, sock);
         }
         received_from_client.clear();
     }

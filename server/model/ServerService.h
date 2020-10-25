@@ -17,6 +17,7 @@
 
 #define REGISTER "REGISTER"
 #define CHATROOM "CHATROOM"
+#define CONNECT "CONNECT"
 #define LOGIN "LOGIN"
 #define ONLINE_CLIENTS "ONLINE"
 #define BACK "##BACK"
@@ -25,7 +26,6 @@
 using namespace std;
 
 static int client_socket;
-static vector<int> clients;
 static vector<Client> client_data;
 
 enum SERVICE_CONSTANTS
@@ -60,9 +60,11 @@ public:
     vector<string> splitter(const string &, string);
     void createMessageFormat(vector<string> &, int);
     void setChatroomStatus(int);
+    void setIndividualChatStatus(int);
     void removeClientFromServer(int);
     void *receiveInputFromClient(void *);
     void getChatroomClients(string, int);
+    void sendToOne(string , int, string);
     static void *threadReferenceHelper(void *context)
     {
         return ((ServerService *)context)->receiveInputFromClient(&client_socket);
