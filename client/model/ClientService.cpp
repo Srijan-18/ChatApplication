@@ -56,18 +56,19 @@ void ClientService::chatroomMessage()
     {
         if (flag == 0)
         {
-            send_msg = CHATROOM + delimiter + client_name + delimiter + "joined the chat\n";
+            send_msg = CHATROOM + delimiter + client_name;
             flag = 1;
         }
         else
         {
-            send_msg = chatroom_chat + client_name + ":" + delimiter + std::string(message);
+            send_msg = chatroom_chat + client_name + delimiter + ":" + delimiter + std::string(message);
         }
 
-        if (send_msg.find(EXIT) != std::string::npos)
+        if (send_msg.find(BACK) != std::string::npos)
         {
+            flag = 0;
             send_msg.clear();
-            send_msg = EXIT + delimiter + client_name + delimiter + " has left the chat\n";
+            send_msg = BACK + delimiter + client_name + delimiter + " has left the chat\n";
             sendToServer(client_socket, send_msg);
             break;
         }

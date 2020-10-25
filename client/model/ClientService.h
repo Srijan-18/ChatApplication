@@ -16,7 +16,7 @@ using namespace std;
 
 #define PORT 50001
 #define CHATROOM "CHATROOM"
-#define EXIT "##EXIT"
+#define BACK "##BACK"
 
 static char message[100];
 static int client_socket;
