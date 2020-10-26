@@ -57,7 +57,7 @@ void MongoDB::saveMessage(string sender, string reciever, string message)
 
     sender.resize(sender.length() - 1);
     message.resize(message.length() - 1);
-    
+
     string pair_key = string_utility.getPairName(sender, reciever);
 
     auto builder = bsoncxx::builder::stream::document{};
@@ -82,10 +82,63 @@ void MongoDB::saveMessage(string sender, string reciever, string message)
     bsoncxx::document::value doc_value2 = builder2
                                           << "PAIR"
                                           << pair_key
-                                          << "CHAT_HISTORY"
+                                          << "CHATS"
                                           << bsoncxx::builder::stream::open_array
                                           << doc_value
                                           << bsoncxx::builder::stream::close_array
                                           << bsoncxx::builder::stream::finalize;
     collection.insert_one(doc_value2.view());
+}
+
+string MongoDB::getChats(string sender, string reciever)
+{
+    string chat_history;
+    mongocxx::database db = client["ChatAppDB"];
+
+    mongocxx::collection collection = db["PairChats"];
+
+    reciever.resize(reciever.length() - 1);
+    string pair_key = string_utility.getPairName(sender, reciever);
+
+    bsoncxx::stdx::optional<bsoncxx::document::value> maybe_result = collection.find_one(document{} << "PAIR" << pair_key << finalize);
+
+    if (maybe_result)
+    {
+        auto cursor = collection.find(make_document(kvp("PAIR", pair_key)));
+
+        for (bsoncxx::v_noabi::document::view doc : cursor)
+        {
+            for (bsoncxx::document::element ele : doc)
+            {
+                if (ele && ele.type() == bsoncxx::type::k_array)
+                {
+                    bsoncxx::array::view subarray{ele.get_array().value};
+                    for (bsoncxx::array::element chat : subarray)
+                    {
+
+                        if (chat.type() == bsoncxx::type::k_document)
+                        {
+                            bsoncxx::document::view subdoc{chat.get_document()};
+
+                            string message = "";
+                            if (getElementFromView(subdoc, "Sender") == sender)
+                                message += "\033[1;32mYou\033[0m : " + getElementFromView(subdoc, "Message") + " \033[5;36m[" + time_utility.getStandardTimeFormat(getElementFromView(subdoc, "Timestamp")) + "]\033[0m \n";
+                            else
+                                message += "\033[1;34m" + getElementFromView(subdoc, "Sender") + "\033[0m" + " : " + getElementFromView(subdoc, "Message") + " \033[5;36m[" + time_utility.getStandardTimeFormat(getElementFromView(subdoc, "Timestamp")) + "]\033[0m \n";
+                            chat_history =  chat_history.append(message);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return chat_history;
+}
+
+string MongoDB::getElementFromView(bsoncxx::v_noabi::document::view view, string fieldName)
+{
+    bsoncxx::document::element element = view[fieldName];
+    if (element.type() == bsoncxx::type::k_int64)
+        return to_string(element.get_int64().value);
+    return element.get_utf8().value.to_string();
 }

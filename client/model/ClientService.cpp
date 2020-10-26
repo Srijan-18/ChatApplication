@@ -110,11 +110,12 @@ void ClientService::oneToOneMessage(string other_client)
     {
         if (flag == 0)
         {
-            send_msg = CONNECT + delimiter + client_name + ">=" + "Connecting to : " + delimiter + other_client + "\n";
+            send_msg = CONNECT + delimiter + client_name + ">=" + "Connecting to : " + delimiter + other_client + "\n" + delimiter + "HISTORY";
             flag = 1;
         }
         else
         {
+            cout << "\nINSIDE CLIENTS SERVICE";
             send_msg = CONNECT + delimiter + other_client + delimiter + client_name + ":" + delimiter + std::string(message);
         }
 

@@ -120,11 +120,19 @@ void ServerService::createMessageFormat(vector<string> &client_message, int sock
 
     if (client_message[0] == CONNECT)
     {
-        for (int i = 2; i < client_message.size(); i++)
+        if (client_message[client_message.size() - 1] == "HISTORY")
         {
-            message += client_message[i] + " ";
+            sendToClient(sock, mongo_obj.getChats(client_message[1], client_message[3]));
         }
-        sendToOne(message, sock, client_message[1]);
+        else
+        {
+            cout << "\nTHIS IS INSIDE ELSE";
+            for (int i = 2; i < client_message.size(); i++)
+            {
+                message += client_message[i] + " ";
+            }
+            sendToOne(message, sock, client_message[1]);
+        }
     }
 
     if (client_message[0] == INSTANT_REPLY)
@@ -166,6 +174,7 @@ void ServerService::setIndividualChatStatus(int sock)
         if (client_iterator->socket == sock && client_iterator->online_status)
         {
             client_iterator->individual_chat = true;
+            break;
         }
     }
 }
@@ -307,10 +316,14 @@ void *ServerService::receiveInputFromClient(void *client_sock)
 
         if (client_response[0] == CONNECT)
         {
+
             if (flag == 0)
             {
                 flag = 1;
                 setIndividualChatStatus(sock);
+                cout << "Sender : @" << client_response[1] << "@\n Reciever : @" << client_response[3] << "@\n"
+                     << mongo_obj.getChats(client_response[1], client_response[3]) << endl;
+                // sendToClient(sock, mongo_obj.getChats(client_response[1], client_response[3]));
             }
             else
             {
