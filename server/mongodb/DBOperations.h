@@ -1,15 +1,16 @@
 #include <cstdint>
 #include <iostream>
 #include <vector>
-
 #include <bsoncxx/builder/stream/document.hpp>
 #include <bsoncxx/types.hpp>
-
 #include <bsoncxx/json.hpp>
 #include <mongocxx/client.hpp>
 #include <mongocxx/stdx.hpp>
 #include <mongocxx/uri.hpp>
 #include <mongocxx/instance.hpp>
+
+#include "../../utility/stringUtility.cpp"
+#include "../../utility/timeUtility.cpp"
 
 using namespace std;
 
@@ -23,10 +24,12 @@ using bsoncxx::builder::stream::open_document;
 class MongoDB
 {
     mongocxx::client client{mongocxx::uri{}};
+    StringUtility string_utility;
+    TimeUtility time_utility;
 
 public:
     bool checkUserPresence(string username);
     bool authenticateUser(string username, string password);
     void saveGivenUser(string userName, string password);
-    friend class ServerService;
+    void saveMessage(string, string,string);
 };
