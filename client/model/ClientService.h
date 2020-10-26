@@ -18,6 +18,7 @@ using namespace std;
 #define CHATROOM "CHATROOM"
 #define BACK "##BACK"
 #define CONNECT "CONNECT"
+#define INSTANT_REPLY "$"
 
 static char message[100];
 static int client_socket;
@@ -59,6 +60,7 @@ public:
     static void setMessage(std::string);
     vector<string> getOnlineClients();
     void oneToOneMessage(string);
+    string sendToOtherClient(string);
     static void *message_helper(void *context)
     {
         return ((ClientService *)context)->recv_message(&client_socket);

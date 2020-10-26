@@ -84,6 +84,9 @@ public:
                 case ONLINE_CLIENTS:
                 {
                     client_view.printOnlineClients(client_service.getOnlineClients());
+                    cin.get();
+                    cout << "\nPress enter to continue" << endl;
+                    cin.get();
                 }
                 break;
                 case QUIT:

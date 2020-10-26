@@ -72,10 +72,29 @@ void ClientService::chatroomMessage()
             sendToServer(client_socket, send_msg);
             break;
         }
+
+        if (send_msg.find(INSTANT_REPLY) != string::npos)
+        {
+            send_msg.clear();
+            send_msg = sendToOtherClient(std::string(message));
+            sendToServer(client_socket, send_msg);
+            continue;
+        }
+
         sendToServer(client_socket, send_msg);
         std::cout << "\n";
     }
     pthread_detach(pthread_self());
+}
+
+string ClientService::sendToOtherClient(std::string message)
+{
+    message.insert(1,1,'>');
+    message.insert(2,1,'=');
+    int position = message.find_first_of(' ');
+    
+    std::string new_message = message.substr(0, position) + ">=" + client_name + ":" + ">=" + message.substr(position + 1, message.length());
+    return new_message;
 }
 
 void ClientService::oneToOneMessage(string other_client)
@@ -91,7 +110,7 @@ void ClientService::oneToOneMessage(string other_client)
     {
         if (flag == 0)
         {
-            send_msg = CONNECT + delimiter + client_name + ">=" + "Connecting to : " + other_client + "\n";
+            send_msg = CONNECT + delimiter + client_name + ">=" + "Connecting to : " + delimiter + other_client + "\n";
             flag = 1;
         }
         else
@@ -106,6 +125,14 @@ void ClientService::oneToOneMessage(string other_client)
             send_msg = BACK + delimiter + client_name + delimiter + " has left the chat\n" + delimiter + CONNECT;
             sendToServer(client_socket, send_msg);
             break;
+        }
+
+        if (send_msg.find(INSTANT_REPLY) != string::npos)
+        {
+            send_msg.clear();
+            send_msg = sendToOtherClient(std::string(message));
+            sendToServer(client_socket, send_msg);
+            continue;
         }
 
         sendToServer(client_socket, send_msg);
