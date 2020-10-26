@@ -124,7 +124,6 @@ void ServerService::createMessageFormat(vector<string> &client_message, int sock
         {
             message += client_message[i] + " ";
         }
-        client_name = client_message[1];
         sendToOne(message, sock, client_message[1]);
     }
 
@@ -134,6 +133,7 @@ void ServerService::createMessageFormat(vector<string> &client_message, int sock
         {
             message += client_message[i] + " ";
         }
+        mongo_obj.saveMessage(client_message[2], client_message[1], message);
         sendToOne(message, sock, client_message[1]);
     }
 
@@ -311,6 +311,10 @@ void *ServerService::receiveInputFromClient(void *client_sock)
             {
                 flag = 1;
                 setIndividualChatStatus(sock);
+            }
+            else
+            {
+                mongo_obj.saveMessage(client_response[2], client_response[1], client_response[3]);
             }
             createMessageFormat(client_response, sock);
         }
