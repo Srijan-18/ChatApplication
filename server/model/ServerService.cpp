@@ -122,10 +122,18 @@ void ServerService::createMessageFormat(vector<string> &client_message, int sock
     {
         for (int i = 2; i < client_message.size(); i++)
         {
-            cout << "message format section : " << client_message[i];
             message += client_message[i] + " ";
         }
         client_name = client_message[1];
+        sendToOne(message, sock, client_message[1]);
+    }
+
+    if (client_message[0] == INSTANT_REPLY)
+    {
+        for (int i = 2; i < client_message.size(); i++)
+        {
+            message += client_message[i] + " ";
+        }
         sendToOne(message, sock, client_message[1]);
     }
 
@@ -306,6 +314,11 @@ void *ServerService::receiveInputFromClient(void *client_sock)
             }
             createMessageFormat(client_response, sock);
         }
+        if (client_response[0] == INSTANT_REPLY)
+        {
+            createMessageFormat(client_response, sock);
+        }
+
         received_from_client.clear();
     }
 }

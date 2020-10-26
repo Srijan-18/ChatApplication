@@ -22,6 +22,7 @@
 #define ONLINE_CLIENTS "ONLINE"
 #define BACK "##BACK"
 #define QUIT "#!EXIT"
+#define INSTANT_REPLY "$"
 
 using namespace std;
 
