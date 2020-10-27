@@ -20,7 +20,7 @@ using namespace std;
 #define CONNECT "CONNECT"
 #define INSTANT_REPLY "$"
 
-static char message[100];
+static char message[4096];
 static int client_socket;
 
 enum SERVICE_CONSTANTS

@@ -115,8 +115,8 @@ void ClientService::oneToOneMessage(string other_client)
         }
         else
         {
-            cout << "\nINSIDE CLIENTS SERVICE";
             send_msg = CONNECT + delimiter + other_client + delimiter + client_name + ":" + delimiter + std::string(message);
+            
         }
 
         if (send_msg.find(BACK) != std::string::npos)
@@ -135,7 +135,6 @@ void ClientService::oneToOneMessage(string other_client)
             sendToServer(client_socket, send_msg);
             continue;
         }
-
         sendToServer(client_socket, send_msg);
         bzero(message, sizeof(message));
         send_msg.clear();
@@ -158,7 +157,7 @@ void ClientService::sendToServer(int sock, std::string send_msg)
 std::string ClientService::receiveFromServer(int sock)
 {
     bzero(message, sizeof(message));
-    recv(sock, message, 500, 0);
+    recv(sock, message, 4096, 0);
     return std::string(message);
 }
 
@@ -205,11 +204,11 @@ void *ClientService::recv_message(void *my_sock)
 {
     int sock = *((int *)my_sock);
     int len;
-    std::string st_len;
+    std::string received_message;
     // client thread always ready to receive message
-    while ((st_len = ClientService::receiveFromServer(sock)).size() > 0)
+    while ((received_message = ClientService::receiveFromServer(sock)).size() > 0)
     {
-        std::cout << st_len << std::endl;
+        std::cout << received_message << std::endl;
         memset(message, 0, sizeof(message));
     }
     return NULL;

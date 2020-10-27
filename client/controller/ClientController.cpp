@@ -46,7 +46,7 @@ public:
 
                 end_key_2 ? cout << "\n++++++LOGGED IN++++++"<< endl
                           : cout << "\nInvalid user name or password" << endl;
-                sleep(2);
+                sleep(1);
                 break;
             case TO_REGISTER:
                 client_service.setClientName(client_view.getInputFor("User ID"));
