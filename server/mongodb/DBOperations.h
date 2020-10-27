@@ -25,19 +25,18 @@ using bsoncxx::builder::basic::kvp;
 using bsoncxx::builder::basic::make_array;
 using bsoncxx::builder::basic::make_document;
 
-
 class MongoDB
 {
     mongocxx::client client{mongocxx::uri{}};
     StringUtility string_utility;
     TimeUtility time_utility;
-    
+
     string getElementFromView(bsoncxx::v_noabi::document::view view, string fieldName);
 
 public:
     bool checkUserPresence(string username);
     bool authenticateUser(string username, string password);
     void saveGivenUser(string userName, string password);
-    void saveMessage(string, string,string);
+    void saveMessage(string, string, string);
     string getChats(string sender, string reciver);
 };

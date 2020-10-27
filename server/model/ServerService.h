@@ -59,7 +59,7 @@ public:
     bool checkClientsCredentials(string, string);
     bool findGivenUser(string);
     vector<string> splitter(const string &, string);
-    void createMessageFormat(vector<string> &, int);
+    void createMessageFormat(vector<string> , int);
     void setChatroomStatus(int);
     void setIndividualChatStatus(int);
     void removeClientFromServer(int);

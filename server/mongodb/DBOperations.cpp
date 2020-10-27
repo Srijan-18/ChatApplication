@@ -125,7 +125,7 @@ string MongoDB::getChats(string sender, string reciever)
                                 message += "\033[1;32mYou\033[0m : " + getElementFromView(subdoc, "Message") + " \033[5;36m[" + time_utility.getStandardTimeFormat(getElementFromView(subdoc, "Timestamp")) + "]\033[0m \n";
                             else
                                 message += "\033[1;34m" + getElementFromView(subdoc, "Sender") + "\033[0m" + " : " + getElementFromView(subdoc, "Message") + " \033[5;36m[" + time_utility.getStandardTimeFormat(getElementFromView(subdoc, "Timestamp")) + "]\033[0m \n";
-                            chat_history =  chat_history.append(message);
+                            chat_history = chat_history.append(message);
                         }
                     }
                 }
@@ -134,7 +134,6 @@ string MongoDB::getChats(string sender, string reciever)
     }
     return chat_history;
 }
-
 string MongoDB::getElementFromView(bsoncxx::v_noabi::document::view view, string fieldName)
 {
     bsoncxx::document::element element = view[fieldName];

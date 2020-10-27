@@ -104,7 +104,7 @@ void ServerService::addOnlineClient(std::string client_name, int sock)
     client_data.push_back(client_ref);
 }
 
-void ServerService::createMessageFormat(vector<string> &client_message, int sock)
+void ServerService::createMessageFormat(vector<string> client_message, int sock)
 {
     string message;
     string client_name;
@@ -119,21 +119,19 @@ void ServerService::createMessageFormat(vector<string> &client_message, int sock
     }
 
     if (client_message[0] == CONNECT)
-    {
         if (client_message[client_message.size() - 1] == "HISTORY")
         {
-            sendToClient(sock, mongo_obj.getChats(client_message[1], client_message[3]));
+            string previous_messages = mongo_obj.getChats(client_message[1], client_message[3]);
+            send(sock, previous_messages.c_str(), strlen(previous_messages.c_str()), 0);
         }
         else
         {
-            cout << "\nTHIS IS INSIDE ELSE";
             for (int i = 2; i < client_message.size(); i++)
             {
                 message += client_message[i] + " ";
             }
             sendToOne(message, sock, client_message[1]);
         }
-    }
 
     if (client_message[0] == INSTANT_REPLY)
     {
@@ -236,13 +234,13 @@ void *ServerService::receiveInputFromClient(void *client_sock)
     int sock = *((int *)client_sock);
     int flag = 0;
     int len;
+    char msg[4096];
     char client_name[10];
     std::string delimiter = ">=";
     while (1)
     {
         std::string received_from_client = receiveFromClient(sock);
         std::vector<std::string> client_response = StringUtility::splitter(received_from_client, delimiter);
-
         if (client_response[0] == REGISTER)
         {
             if (!findGivenUser(client_response[1]))
@@ -321,9 +319,6 @@ void *ServerService::receiveInputFromClient(void *client_sock)
             {
                 flag = 1;
                 setIndividualChatStatus(sock);
-                cout << "Sender : @" << client_response[1] << "@\n Reciever : @" << client_response[3] << "@\n"
-                     << mongo_obj.getChats(client_response[1], client_response[3]) << endl;
-                // sendToClient(sock, mongo_obj.getChats(client_response[1], client_response[3]));
             }
             else
             {
