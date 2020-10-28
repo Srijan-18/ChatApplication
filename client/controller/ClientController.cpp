@@ -44,8 +44,8 @@ public:
                 client_service.setClientPassword(client_view.getInputFor("Password"));
                 end_key_2 = client_service.loginClient(socket, client_service.getClientName(), client_service.getClientPassword());
 
-                end_key_2 ? cout << "\n++++++LOGGED IN++++++"<< endl
-                          : cout << "\nInvalid user name or password" << endl;
+                end_key_2 ? client_view.displayMessage("\n\033[32;1mLogin Successful..\033[0m") :
+                            client_view.displayMessage("\n\033[31;1mInvalid user name or password\033[0m"); 
                 sleep(1);
                 break;
             case TO_REGISTER:
@@ -59,14 +59,14 @@ public:
                 break;
 
             default:
-                client_view.displayMessage("\n##  Invalid Input  ##");
+                client_view.displayMessage("\n\033[31;1m##  Invalid Input  ##\033[0m");
                 break;
             }
         }
 
         while (end_key)
         {   system("clear");
-            cout << "Online : " << client_service.getClientName() << endl;
+            cout << "\033[32;1mOnline : " << client_service.getClientName() << "\033[0m" << endl;
             int user_choice_2 = client_view.selectOption();
             switch (user_choice_2)
             {
@@ -85,7 +85,7 @@ public:
                 {
                     client_view.printOnlineClients(client_service.getOnlineClients());
                     cin.get();
-                    cout << "\nPress enter to continue" << endl;
+                    cout << "\nPress ENTER to continue" << endl;
                     cin.get();
                 }
                 break;
@@ -103,7 +103,7 @@ public:
                 }
                 break;
                 default:
-                    client_view.displayMessage("\n##  Invalid Input  ##");
+                    client_view.displayMessage("\n\033[31;1m##  Invalid Input  ##\033[0m");
                     break;
             }
         }

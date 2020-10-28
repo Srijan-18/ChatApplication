@@ -110,7 +110,7 @@ void ClientService::oneToOneMessage(string other_client)
     {
         if (flag == 0)
         {
-            send_msg = CONNECT + delimiter + client_name + ">=" + "Connecting to : " + delimiter + other_client + "\n" + delimiter + "HISTORY";
+            send_msg = CONNECT + delimiter + client_name + delimiter + "Sending Messages to : " + delimiter + other_client + "\n" + delimiter + "HISTORY";
             flag = 1;
         }
         else
@@ -195,7 +195,7 @@ bool ClientService::loginClient(int socket, string client_name, string password)
     else if (server_response.find("USERONLINE") != std::string::npos)
     {
         cout << "\n"
-             << client_name << " already logged in." << endl;
+             << "\033[31;1m " << client_name << " already logged in.\033[0m" << endl;
     }
     return login_status;
 }
