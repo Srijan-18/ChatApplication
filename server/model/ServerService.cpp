@@ -210,7 +210,7 @@ void ServerService::removeClientFromServer(int sock)
     {
         if (client_iterator->socket == sock)
         {
-            cout << " Name: " << client_iterator->name << " removed" << endl;
+            cout << client_iterator->name << " disconnected" << endl;
             client_data.erase(client_iterator);
             break;
         }
@@ -223,7 +223,7 @@ void ServerService::getChatroomClients(string name, int sock)
     {
         if (client_data[i].socket != sock && client_data[i].chatroom_status)
         {
-            string temp = client_data[i].name + " joined the chat\n";
+            string temp = "\033[32;1m" + client_data[i].name + "\033[0m" + " joined the chat\n";
             sendToClient(sock, temp);
         }
     }
@@ -246,7 +246,7 @@ void *ServerService::receiveInputFromClient(void *client_sock)
             if (!findGivenUser(client_response[1]))
                 saveClientCredentials(client_response[1], client_response[2], sock);
             else
-                sendToClient(sock, "\nUSER ALREADY REGISTERED");
+                sendToClient(sock, "\n\033[31;1mUSER ALREADY REGISTERED\033[0m");
 
             client_response.clear();
         }
@@ -300,9 +300,9 @@ void *ServerService::receiveInputFromClient(void *client_sock)
             if (flag == 0)
             {
                 flag = 1;
-                string temp;
-                temp = client_response[1] + " " + "joined the chat\n";
-                sendToAllClients(temp, sock);
+                string notify_others;
+                notify_others = "\033[32;1m" + client_response[1] + "\033[0m joined the chat\n";
+                sendToAllClients(notify_others, sock);
                 setChatroomStatus(sock);
                 getChatroomClients(client_response[1], sock);
             }
