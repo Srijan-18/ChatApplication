@@ -10,7 +10,7 @@
 #include <vector>
 #include <thread>
 #include <mutex>
-#include "../../utility/stringUtility.cpp"
+#include "../../utility/StringUtility.cpp"
 
 using namespace std;
 

@@ -1,5 +1,5 @@
 #include "../model/ClientService.h"
-#include "../view/clientView.h"
+#include "../view/ClientView.h"
 
 class ClientController
 {
