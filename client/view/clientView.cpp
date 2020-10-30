@@ -72,3 +72,18 @@ void ClientView::printOnlineClients(vector<string> online_clients)
             cout << "\n\033[32;1m" << online_client << "\033[0m" << endl;
     }
 }
+
+string ClientView::inputPassword()
+{
+    while (true)
+    {
+        string password_input[2];
+        password_input[0] = getpass("\033[36;1mEnter Password : \033[0m");
+        password_input[1] = getpass("\033[36;1mRe-Enter Password : \033[0m");
+        
+        if(password_input[0].compare(password_input[1]) == 0)
+        return password_input[0];
+
+        cout << "\n\033[31;1mPASSWORDS MISMATCH\033[0m\n\n"; 
+    }
+}

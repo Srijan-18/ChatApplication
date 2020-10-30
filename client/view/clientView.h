@@ -2,6 +2,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <unistd.h>
+
 using namespace std;
 class ClientView
 {
@@ -18,4 +20,5 @@ public:
     void displayMessage(string);
     string getInputFor(string);
     void printOnlineClients(vector<string>);
+    string inputPassword();
 };

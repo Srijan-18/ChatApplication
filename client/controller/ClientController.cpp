@@ -41,7 +41,7 @@ public:
             {
             case TO_LOGIN:
                 client_service.setClientName(client_view.getInputFor("User ID"));
-                client_service.setClientPassword(client_view.getInputFor("Password"));
+                client_service.setClientPassword(client_view.inputPassword());
                 end_key_2 = client_service.loginClient(socket, client_service.getClientName(), client_service.getClientPassword());
 
                 end_key_2 ? client_view.displayMessage("\n\033[32;1mLogin Successful..\033[0m") :
@@ -50,7 +50,7 @@ public:
                 break;
             case TO_REGISTER:
                 client_service.setClientName(client_view.getInputFor("User ID"));
-                client_service.setClientPassword(client_view.getInputFor("Password"));
+                client_service.setClientPassword(client_view.inputPassword());
                 client_service.registerClient(socket, client_service.getClientName(), client_service.getClientPassword());
                 break;
             case QUIT:
