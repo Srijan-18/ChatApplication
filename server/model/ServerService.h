@@ -12,7 +12,7 @@
 #include <algorithm>
 
 #include "ClientStructure.cpp"
-#include "../../utility/stringUtility.cpp"
+#include "../../utility/StringUtility.cpp"
 #include "../mongodb/DBOperations.h"
 
 #define REGISTER "REGISTER"

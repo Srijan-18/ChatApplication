@@ -9,8 +9,8 @@
 #include <mongocxx/uri.hpp>
 #include <mongocxx/instance.hpp>
 
-#include "../../utility/stringUtility.cpp"
-#include "../../utility/timeUtility.cpp"
+#include "../../utility/StringUtility.cpp"
+#include "../../utility/TimeUtility.cpp"
 
 using namespace std;
 
