@@ -9,11 +9,11 @@
 #include <map>
 #include <sstream>
 #include <vector>
-#include <istream>
-#include "../../client/model/ClientStructure.cpp"
+#include <algorithm>
+
+#include "ClientStructure.cpp"
 #include "../../utility/stringUtility.cpp"
 #include "../mongodb/DBOperations.h"
-#include <algorithm>
 
 #define REGISTER "REGISTER"
 #define CHATROOM "CHATROOM"

@@ -107,14 +107,12 @@ void ServerService::addOnlineClient(std::string client_name, int sock)
 void ServerService::createMessageFormat(vector<string> client_message, int sock)
 {
     string message;
-    string client_name;
     if (client_message[0] == CHATROOM)
     {
         for (int i = 1; i < client_message.size(); i++)
         {
             message += client_message[i] + " ";
         }
-        client_name = client_message[1];
         sendToAllClients(message, sock);
     }
 
@@ -139,17 +137,17 @@ void ServerService::createMessageFormat(vector<string> client_message, int sock)
         {
             message += client_message[i] + " ";
         }
-        mongo_obj.saveMessage(client_message[2], client_message[1], message);
+        int pos = message.find_first_of(" ");
+        mongo_obj.saveMessage(client_message[2], client_message[1], message.substr(pos + 1, message.length() - pos -1));
         sendToOne(message, sock, client_message[1]);
     }
-
     message.clear();
 }
 
 void ServerService::saveClientCredentials(string client_name, string client_password, int socket)
 {
     mongo_obj.saveGivenUser(client_name, client_password);
-    sendToClient(socket, "\nREGISTERATION SUCCESSFUL");
+    sendToClient(socket, "\n\033[32;1mREGISTERATION SUCCESSFUL\033[0m");
 }
 
 void ServerService::setChatroomStatus(int sock)
