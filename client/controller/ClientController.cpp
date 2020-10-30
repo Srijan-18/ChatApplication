@@ -66,7 +66,7 @@ public:
 
         while (end_key)
         {   system("clear");
-            cout << "\033[32;1mOnline : " << client_service.getClientName() << "\033[0m" << endl;
+            client_view.displayMessage("\033[32;1mOnline : " + client_service.getClientName() + "\033[0m");
             int user_choice_2 = client_view.selectOption();
             switch (user_choice_2)
             {
@@ -85,7 +85,7 @@ public:
                 {
                     client_view.printOnlineClients(client_service.getOnlineClients());
                     cin.get();
-                    cout << "\nPress ENTER to continue" << endl;
+                    client_view.displayMessage("\nPress ENTER to continue");
                     cin.get();
                 }
                 break;
